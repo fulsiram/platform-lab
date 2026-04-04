@@ -1,0 +1,9 @@
+keys:
+  - &mbp age1ayatyazanagur9j0ytenxmj4hu928nssmf5l9ev2yc5qz93ne3lq66hekx
+  - &pepperoni age1hfe3v38m4rnm0vnypp8tcz03mhsl72rlstxz9umzaxhjddcad49qhrfaps
+creation_rules:
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *mbp
+          - *pepperoni
