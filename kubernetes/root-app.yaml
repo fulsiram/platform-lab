@@ -11,7 +11,7 @@ spec:
     path: kubernetes/apps
   destination:
     server: https://kubernetes.default.svc
-    namespace: traefik
+    namespace: argocd
   syncPolicy:
     automated:
       selfHeal: true
