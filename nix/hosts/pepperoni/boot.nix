@@ -31,11 +31,9 @@
 
       luks.reusePassphrases = true;
 
-      kernelModules = [
-        "nvme"
-        "igb"
-      ];
       availableKernelModules = [
+        "igb"
+        # Hetzner QEMU vKVM
         "virtio_pci"
         "virtio_blk"
         "virtio_net"
@@ -46,7 +44,7 @@
         enable = true;
         ssh = {
           enable = true;
-          port = 22;
+          port = 2222;
           hostKeys = [
             "/etc/secrets/initrd/ssh_host_ed25519_key"
             "/etc/secrets/initrd/ssh_host_rsa_key"
