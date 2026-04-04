@@ -8,13 +8,13 @@ spec:
   sources:
     - repoURL: https://traefik.github.io/charts
       chart: traefik
-      targetRevision: HEAD
+      targetRevision: 39.x.x
       helm:
         releaseName: traefik
         valueFiles:
-          - $values/kubernetes/services/values.yaml
+          - $values/kubernetes/services/traefik/values.yaml
     - repoURL: https://github.com/fulsiram/homelab.git
-      targetRevision: HEAD
+      targetRevision: main
       ref: values
   destination:
     server: https://kubernetes.default.svc
