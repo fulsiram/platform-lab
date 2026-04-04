@@ -1,0 +1,21 @@
+global:
+  domain: argocd.salami.network
+
+configs:
+  params:
+    server.insecure: true
+
+server:
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    extraTls:
+      - hosts:
+          - argocd.salami.network
+
+    ingressGrpc:
+      enabled: true
+      ingressClassName: traefik
+      extraTls:
+        - hosts:
+            - argocd.salami.network

@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://traefik.github.io/charts
+      chart: traefik
+      targetRevision: HEAD
+      helm:
+        releaseName: traefik
+        valueFiles:
+          - $values/kubernetes/services/values.yaml
+    - repoURL: https://github.com/fulsiram/homelab.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: "in-cluster"
+    namespace: "traefik"
