@@ -46,6 +46,7 @@
           nixos-rebuild
           nixfmt
           age
+          kubeseal
         ];
       };
     };
