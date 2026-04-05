@@ -1,0 +1,10 @@
+expose:
+  type: ingress
+  ingress:
+    hosts:
+      core: harbor.salami.network
+    controller: default
+  tls:
+    enabled: true
+
+externalURL: https://harbor.salami.network
