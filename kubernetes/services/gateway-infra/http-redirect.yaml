@@ -9,8 +9,12 @@ spec:
     - name: gateway
       sectionName: http-redirect
   rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
     - filters:
         - type: RequestRedirect
           requestRedirect:
-            schema: https
+            scheme: https
             statusCode: 301
