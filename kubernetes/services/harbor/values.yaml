@@ -1,5 +1,8 @@
 expose:
   type: route
+  tls:
+    enabled: true
+    certSource: none
   route:
     parentRefs:
       - name: gateway
