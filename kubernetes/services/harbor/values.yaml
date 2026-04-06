@@ -6,7 +6,7 @@ expose:
   route:
     parentRefs:
       - name: gateway
-        sectionName: wildcard-salami-network
+        sectionName: https-wildcard
         namespace: gateway-infra
     hosts:
       - harbor.salami.network
