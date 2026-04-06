@@ -2,6 +2,8 @@ signupsAllowed: false
 
 domain: "https://warden.salami.network"
 
+resourceType: Deployment
+
 adminToken:
   existingSecret: "vaultwarden-admin-token"
   existingSecretKey: "token"
