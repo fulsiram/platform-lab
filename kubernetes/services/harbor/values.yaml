@@ -3,6 +3,8 @@ expose:
   ingress:
     hosts:
       core: harbor.salami.network
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-staging
     controller: default
   tls:
     enabled: true

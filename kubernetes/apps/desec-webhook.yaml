@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: acme-desec-webhook
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/fulsiram/homelab.git
+      path: kubernetes/services/acme-desec-webhook
+      targetRevision: 1.20.0
+      helm:
+        releaseName: desec-webhook
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
