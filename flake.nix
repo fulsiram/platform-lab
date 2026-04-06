@@ -47,6 +47,7 @@
           nixfmt
           age
           kubeseal
+          kustomize
         ];
       };
     };
