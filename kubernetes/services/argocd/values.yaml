@@ -6,16 +6,16 @@ configs:
     server.insecure: true
 
 server:
-  ingress:
+  httproute:
     enabled: true
-    ingressClassName: traefik
-    extraTls:
-      - hosts:
-          - argocd.salami.network
+    parentRefs:
+      - name: gateway
+        namespace: gateway-infra
+        sectionName: https-wildcard
 
-    ingressGrpc:
-      enabled: true
-      ingressClassName: traefik
-      extraTls:
-        - hosts:
-            - argocd.salami.network
+  grpcroute:
+    enabled: true
+    parentRefs:
+      - name: gateway
+        namespace: gateway-infra
+        sectionName: https-wildcard
