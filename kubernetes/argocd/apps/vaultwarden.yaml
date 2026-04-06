@@ -6,16 +6,9 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: https://guerzon.github.io/vaultwarden
-      chart: vaultwarden
-      targetRevision: 0.35.1
-      helm:
-        releaseName: vaultwarden
-        valueFiles:
-          - $values/kubernetes/apps/vaultwarden/values.yaml
     - repoURL: https://github.com/fulsiram/homelab.git
+      path: kubernetes/apps/vaultwarden/app/
       targetRevision: main
-      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: vaultwarden
