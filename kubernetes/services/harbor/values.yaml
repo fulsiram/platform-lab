@@ -1,12 +1,10 @@
 expose:
-  type: ingress
-  ingress:
-    hosts:
-      core: harbor.salami.network
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-staging
-    controller: default
-  tls:
-    enabled: true
+  type: route
+  route:
+    parentRefs:
+      - name: gateway
+        sectionName: wildcard-salami-network
+        namespace: gateway-infra
+    hosts: harbor.salami.network
 
 externalURL: https://harbor.salami.network
