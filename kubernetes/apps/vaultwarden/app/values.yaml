@@ -1,5 +1,7 @@
 signupsAllowed: false
 
+domain: "https://warden.salami.network"
+
 adminToken:
   existingSecret: "vaultwarden-admin-token"
   existingSecretKey: "token"
