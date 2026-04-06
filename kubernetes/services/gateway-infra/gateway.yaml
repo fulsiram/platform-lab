@@ -21,7 +21,7 @@ spec:
         mode: Terminate
         certificateRefs:
           - kind: Secret
-            name: wildcard-salami.network-tls
+            name: wildcard-salami-network-tls
       allowedRoutes:
         namespaces:
           from: All
