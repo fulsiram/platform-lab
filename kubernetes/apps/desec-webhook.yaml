@@ -8,7 +8,7 @@ spec:
   sources:
     - repoURL: https://github.com/fulsiram/homelab.git
       path: kubernetes/services/acme-desec-webhook
-      targetRevision: 1.20.0
+      targetRevision: main
       helm:
         releaseName: desec-webhook
   destination:
