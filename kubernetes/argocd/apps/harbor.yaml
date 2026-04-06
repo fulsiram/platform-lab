@@ -12,7 +12,7 @@ spec:
       helm:
         releaseName: harbor
         valueFiles:
-          - $values/kubernetes/services/harbor/values.yaml
+          - $values/kubernetes/apps/harbor/values.yaml
     - repoURL: https://github.com/fulsiram/homelab.git
       targetRevision: main
       ref: values

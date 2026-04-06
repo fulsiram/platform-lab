@@ -1,24 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cert-manager
+  name: gateway-infra
   namespace: argocd
 spec:
   project: default
   sources:
-    - repoURL: oci://quay.io/jetstack/charts/cert-manager
-      chart: cert-manager
-      targetRevision: 1.20.0
-      helm:
-        releaseName: cert-manager
-        valueFiles:
-          - $values/kubernetes/services/cert-manager/values.yaml
     - repoURL: https://github.com/fulsiram/homelab.git
+      path: kubernetes/apps/gateway-infra
       targetRevision: main
-      ref: values
   destination:
     server: https://kubernetes.default.svc
-    namespace: cert-manager
+    namespace: gateway-infra
   syncPolicy:
     automated:
       selfHeal: true

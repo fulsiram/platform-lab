@@ -12,7 +12,7 @@ spec:
       helm:
         releaseName: traefik
         valueFiles:
-          - $values/kubernetes/services/traefik/values.yaml
+          - $values/kubernetes/apps/traefik/values.yaml
     - repoURL: https://github.com/fulsiram/homelab.git
       targetRevision: main
       ref: values

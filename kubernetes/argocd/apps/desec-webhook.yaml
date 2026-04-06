@@ -1,24 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd
+  name: acme-desec-webhook
   namespace: argocd
 spec:
   project: default
   sources:
-    - repoURL: https://argoproj.github.io/argo-helm
-      chart: argo-cd
-      targetRevision: 9.x.x
-      helm:
-        releaseName: argocd
-        valueFiles:
-          - $values/kubernetes/services/argocd/values.yaml
     - repoURL: https://github.com/fulsiram/homelab.git
+      path: kubernetes/apps/acme-desec-webhook
       targetRevision: main
-      ref: values
+      helm:
+        releaseName: desec-webhook
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: cert-manager
   syncPolicy:
     automated:
       selfHeal: true
