@@ -5,6 +5,7 @@ expose:
       - name: gateway
         sectionName: wildcard-salami-network
         namespace: gateway-infra
-    hosts: harbor.salami.network
+    hosts:
+      - harbor.salami.network
 
 externalURL: https://harbor.salami.network
