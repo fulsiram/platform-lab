@@ -1,0 +1,15 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-salami-network-certificate
+spec:
+  secretName: wildcard-salami-network-tls
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsNames:
+    - "salami.network"
+    - "*.salami.network"
+  duration: 2160h
+  renewBefore: 720h

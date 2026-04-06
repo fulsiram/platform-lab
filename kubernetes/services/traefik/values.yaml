@@ -3,16 +3,4 @@ providers:
     enabled: true
 
 gateway:
-  listeners:
-    web:
-      namespacePolicy:
-        from: All
-
-ports:
-  web:
-    http:
-      redirections:
-        entryPoint:
-          to: websecure
-          scheme: https
-          permanent: true
+  enabled: false

@@ -1,0 +1,27 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway
+  namespace: gateway-infra
+spec:
+  gatewayClassName: traefik
+  listeners:
+    - name: http-redirect
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+    - name: https-wildcard
+      protocol: HTTPS
+      port: 443
+      hostname: "*.salami.network"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: wildcard-salami.network-tls
+      allowedRoutes:
+        namespaces:
+          from: All
