@@ -1,0 +1,8 @@
+helmCharts:
+  - name: vaultwarden
+    repo: https://guerzon.github.io/vaultwarden
+    version: 0.35.1
+    valuesFile: values.yaml
+
+resources:
+  - httproute.yaml
