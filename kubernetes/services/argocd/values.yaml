@@ -14,7 +14,7 @@ server:
         sectionName: https-wildcard
 
   grpcroute:
-    enabled: true
+    enabled: false
     parentRefs:
       - name: gateway
         namespace: gateway-infra
