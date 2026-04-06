@@ -1,0 +1,10 @@
+signupsAllowed: false
+
+adminToken:
+  existingSecret: "vaultwarden-admin-token"
+  existingSecretKey: "token"
+
+database:
+  type: postgresql
+  existingSecret: "vaultwarden-db-app"
+  existingSecretKey: "uri"
