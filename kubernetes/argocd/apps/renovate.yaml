@@ -6,16 +6,11 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: oci://ghcr.io/renovatebot/charts
-      chart: renovate
-      targetRevision: 46.101.4
+    - repoURL: https://github.com/fulsiram/homelab.git
+      path: kubernetes/apps/renovate/app/
+      targetRevision: main
       helm:
         releaseName: renovate
-        valueFiles:
-          - $values/kubernetes/apps/renovate/values.yaml
-    - repoURL: https://github.com/fulsiram/homelab.git
-      targetRevision: main
-      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: renovate
