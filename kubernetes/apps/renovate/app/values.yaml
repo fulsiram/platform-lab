@@ -5,6 +5,7 @@ renovate:
       {
         "platform": "github",
         "autodiscover": false,
+        "gitAuthor": "Renovate Bot <renovate@salami.network>",
         "repositories": [
           "fulsiram/homelab"
         ]
