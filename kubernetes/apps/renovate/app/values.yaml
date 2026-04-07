@@ -1,0 +1,11 @@
+renovate:
+  existingSecret: "renovate-secret"
+  renovate:
+    config: |
+      {
+        "platform": "github",
+        "autodiscover": false,
+        "repositories": [
+          "fulsiram/homelab"
+        ]
+      }

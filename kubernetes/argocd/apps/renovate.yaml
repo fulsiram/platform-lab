@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: renovate
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: oci://ghcr.io/renovatebot/charts
+      chart: renovate
+      targetRevision: 46.101.4
+      helm:
+        releaseName: renovate
+        valueFiles:
+          - $values/kubernetes/apps/renovate/values.yaml
+    - repoURL: https://github.com/fulsiram/homelab.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: renovate
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
