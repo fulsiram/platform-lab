@@ -25,5 +25,5 @@ appVersion: "1.0.0"
 
 dependencies:
   - name: renovate
-    version: "46.101.4"
+    version: "46.105.1"
     repository: "oci://ghcr.io/renovatebot/charts"
