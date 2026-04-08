@@ -5,7 +5,20 @@
   ],
   "argocd": {
     "managerFilePatterns": [
-      "/kubernetes\/argocd/.+\\.yaml$/"
+      "/kubernetes\\/argocd/.+\\.yaml$/"
     ]
-  }
+  },
+  "packageRules": [
+    {
+      "description": "Delay updates by 3 days for supply chain safety",
+      "matchManagers": ["argocd", "helmv3"],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Auto-merge minor and patch updates after delay",
+      "matchManagers": ["argocd", "helmv3"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    }
+  ]
 }
