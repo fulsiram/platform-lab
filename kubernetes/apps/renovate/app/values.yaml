@@ -1,5 +1,7 @@
 renovate:
   existingSecret: "renovate-secret"
+  env:
+    LOG_LEVEL: "debug"
   renovate:
     config: |
       {
