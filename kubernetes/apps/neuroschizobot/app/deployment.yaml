@@ -1,0 +1,29 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuroschizobot
+spec:
+  replica: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: neuroschizobot
+  template:
+    metadata:
+      labels:
+        app: neuroschizobot
+    spec:
+      containers:
+        - name: neuroschizobot
+          image: harbor.salami.network/neuroschizobot/bot:latest
+          envFrom:
+            - secretRef:
+                name: neuroschizobot-secrets
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: neuroschizobot-db-app
+                  key: uri

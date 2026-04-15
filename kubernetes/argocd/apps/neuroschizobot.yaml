@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: neuroschizobot
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/fulsiram/homelab.git
+    path: kubernetes/apps/neuroschizobot/app/
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: neuroschizobot
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: neuroschizobot-db
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/fulsiram/homelab.git
+    path: kubernetes/apps/neuroschizobot/db/
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: neuroschizobot
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
