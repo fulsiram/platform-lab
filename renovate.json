@@ -4,7 +4,7 @@
     "config:best-practices"
   ],
   "automergeType": "pr",
-  "platformAutomerge": false,
+  "platformAutomerge": true,
   "argocd": {
     "managerFilePatterns": [
       "/kubernetes\\/argocd/.+\\.yaml$/"
