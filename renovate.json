@@ -3,6 +3,7 @@
   "extends": [
     "config:best-practices"
   ],
+  "automergeType": "pr",
   "platformAutomerge": false,
   "argocd": {
     "managerFilePatterns": [
@@ -12,13 +13,22 @@
   "packageRules": [
     {
       "description": "Delay updates by 3 days for supply chain safety",
-      "matchManagers": ["argocd", "helmv3"],
+      "matchManagers": [
+        "argocd",
+        "helmv3"
+      ],
       "minimumReleaseAge": "3 days"
     },
     {
       "description": "Auto-merge minor and patch updates after delay",
-      "matchManagers": ["argocd", "helmv3"],
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchManagers": [
+        "argocd",
+        "helmv3"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "automerge": true
     }
   ]
