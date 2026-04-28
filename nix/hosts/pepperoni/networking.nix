@@ -2,7 +2,7 @@
 {
   networking = {
     useDHCP = false;
-    hostName = "hostname";
+    hostName = "pepperoni";
 
     interfaces.enp7s0 = {
       ipv4.addresses = [
