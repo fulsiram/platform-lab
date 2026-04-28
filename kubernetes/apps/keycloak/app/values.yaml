@@ -1,0 +1,73 @@
+command:
+  - "/opt/keycloak/bin/kc.sh"
+  - "start"
+  - "--http-port=8080"
+  - "--hostname-strict=false"
+
+extraEnv: |
+  - name: KEYCLOAK_ADMIN
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "keycloak.fullname" . }}-admin-creds
+        key: user
+  - name: KEYCLOAK_ADMIN_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ include "keycloak.fullname" . }}-admin-creds
+        key: password
+  - name: JAVA_OPTS_APPEND
+    value: >-
+      -XX:MaxRAMPercentage=50.0
+      -Djgroups.dns.query={{ include "keycloak.fullname" . }}-headless
+  - name: KC_DB_URL_HOST
+    valueFrom:
+      secretKeyRef:
+        name: keycloak-db-app
+        key: host
+  - name: KC_DB_URL_PORT
+    valueFrom:
+      secretKeyRef:
+        name: keycloak-db-app
+        key: port
+  - name: KC_DB_URL_db
+    valueFrom:
+      secretKeyRef:
+        name: keycloak-db-app
+        key: dbname
+  - name: KC_DB_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: keycloak-db-app
+        key: username
+
+dbchecker:
+  enabled: true
+
+db:
+  vendor: postgres
+  existingSecret: keycloak-db-app
+  existingSecretKey: password
+
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: gateway
+      sectionName: https-wildcard
+      namespace: gateway-infra
+  hosts:
+    - auth.salami.network
+
+  console:
+    enabled: true
+    parentRefs:
+      - name: gateway
+        sectionName: https-wildcard
+        namespace: gateway-infra
+    hosts:
+      - harbor.salami.network
+
+secrets:
+  admin-creds:
+    stringData:
+      user: admin
+      password: secret
