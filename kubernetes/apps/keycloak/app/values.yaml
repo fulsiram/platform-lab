@@ -2,7 +2,10 @@ command:
   - "/opt/keycloak/bin/kc.sh"
   - "start"
   - "--http-port=8080"
-  - "--hostname-strict=false"
+  - "--hostname-strict=true"
+  - "--hostname=https://auth.salami.network"
+  - "--proxy-headers=xforwarded"
+  - "--http-enabled=true"
 
 extraEnv: |
   - name: KEYCLOAK_ADMIN
@@ -40,6 +43,12 @@ extraEnv: |
         name: keycloak-db-app
         key: username
 
+dbchecker:
+  enabled: true
+
+database:
+  hostname: keycloak-db-rw
+
 db:
   vendor: postgres
   existingSecret: keycloak-db-app
@@ -61,7 +70,7 @@ httpRoute:
         sectionName: https-wildcard
         namespace: gateway-infra
     hosts:
-      - harbor.salami.network
+      - auth.salami.network
 
 secrets:
   admin-creds:
