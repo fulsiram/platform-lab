@@ -30,6 +30,7 @@ spec:
     - name: nixos-build-image
       runAfter: ["fetch-source"]
       taskRef:
+        kind: Task
         name: nixos-build-image
       workspaces:
         - name: source
@@ -45,6 +46,7 @@ spec:
     - name: build-push-rootdisk
       runAfter: ["nixos-build-image"]
       taskRef:
+        kind: Task
         name: buildkit-build-push
       workspaces:
         - name: source
