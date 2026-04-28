@@ -44,6 +44,9 @@
         ];
       };
 
+      packages.x86_64-linux.devContainerImage =
+        self.nixosConfigurations.devContainer.config.system.build.images.kubevirt;
+
       checks.x86_64-linux = deploy-rs.lib.x86_64-linux.deployChecks self.deploy;
 
       formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt;
