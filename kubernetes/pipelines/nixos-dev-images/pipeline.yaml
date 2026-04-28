@@ -102,9 +102,12 @@ metadata:
 spec:
   params:
     - name: IMAGE
+      type: string
     - name: DOCKERFILE
+      type: string
       default: Dockerfile
     - name: CONTEXT
+      type: string
       default: .
   workspaces:
     - name: source
