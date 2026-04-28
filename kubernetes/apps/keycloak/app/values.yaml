@@ -48,6 +48,9 @@ db:
   existingSecret: keycloak-db-app
   existingSecretKey: password
 
+http:
+  relativePath: /
+
 httpRoute:
   enabled: true
   parentRefs:
