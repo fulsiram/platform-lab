@@ -18,6 +18,7 @@
   services.openssh.enable = true;
   services.k3s.enable = true;
   services.k3s.extraFlags = [
+    "--cluster-init"
     "--tls-san=pepperoni.salami.network"
   ];
   services.k3s.disable = [ "traefik" ];
