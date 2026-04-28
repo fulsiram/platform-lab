@@ -1,19 +1,32 @@
-command:
-  - "/opt/keycloak/bin/kc.sh"
-  - "start"
-  - "--http-port=8080"
-  - "--hostname-strict=true"
-  - "--hostname=https://auth.salami.network"
-  - "--proxy-headers=xforwarded"
-  - "--http-enabled=true"
+http:
+  relativePath: /
+
+proxy:
+  enabled: true
+  mode: xforwarded
+  http:
+    enabled: true
+
+database:
+  vendor: postgres
+  hostname: keycloak-db-rw
+  port: 5432
+  database: keycloak
+  username: keycloak
+  existingSecret: keycloak-db-app
+  existingSecretKey: password
 
 extraEnv: |
-  - name: KEYCLOAK_ADMIN
+  - name: KC_HOSTNAME
+    value: https://auth.salami.network
+  - name: KC_HOSTNAME_STRICT
+    value: "true"
+  - name: KC_BOOTSTRAP_ADMIN_USERNAME
     valueFrom:
       secretKeyRef:
         name: {{ include "keycloak.fullname" . }}-admin-creds
         key: user
-  - name: KEYCLOAK_ADMIN_PASSWORD
+  - name: KC_BOOTSTRAP_ADMIN_PASSWORD
     valueFrom:
       secretKeyRef:
         name: {{ include "keycloak.fullname" . }}-admin-creds
@@ -22,34 +35,6 @@ extraEnv: |
     value: >-
       -XX:MaxRAMPercentage=50.0
       -Djgroups.dns.query={{ include "keycloak.fullname" . }}-headless
-  - name: KC_DB_URL_HOST
-    valueFrom:
-      secretKeyRef:
-        name: keycloak-db-app
-        key: host
-  - name: KC_DB_URL_PORT
-    valueFrom:
-      secretKeyRef:
-        name: keycloak-db-app
-        key: port
-  - name: KC_DB_URL_db
-    valueFrom:
-      secretKeyRef:
-        name: keycloak-db-app
-        key: dbname
-  - name: KC_DB_USERNAME
-    valueFrom:
-      secretKeyRef:
-        name: keycloak-db-app
-        key: username
-
-db:
-  vendor: postgres
-  existingSecret: keycloak-db-app
-  existingSecretKey: password
-
-http:
-  relativePath: /
 
 httpRoute:
   enabled: true
@@ -59,15 +44,6 @@ httpRoute:
       namespace: gateway-infra
   hostnames:
     - auth.salami.network
-
-  console:
-    enabled: true
-    parentRefs:
-      - name: gateway
-        sectionName: https-wildcard
-        namespace: gateway-infra
-    hostnames:
-      - auth.salami.network
 
 secrets:
   admin-creds:
