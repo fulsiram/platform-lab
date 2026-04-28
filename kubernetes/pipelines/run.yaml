@@ -1,0 +1,24 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: build-nixos-run-
+spec:
+  pipelineRef:
+    name: clone-and-build-nixos-image
+  serviceAccountName: pipeline-builder
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+    - name: data
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
+  params:
+    - name: repo-url
+      value: https://github.com/fulsiram/homelab.git

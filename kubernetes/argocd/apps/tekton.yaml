@@ -46,3 +46,25 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tekton-ci-pipelines
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/fulsiram/homelab.git
+      path: kubernetes/pipelines/nixos-dev-images/
+      targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ci-pipelines
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

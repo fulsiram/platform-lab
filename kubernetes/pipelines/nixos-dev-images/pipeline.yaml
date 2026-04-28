@@ -1,0 +1,125 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: clone-and-build-nixos-image
+spec:
+  params:
+    - name: repo-url
+      type: string
+  workspaces:
+    - name: data
+
+  tasks:
+    - name: fetch-source
+      taskRef:
+        resolver: hub
+        params:
+          - name: kind
+            value: task
+          - name: name
+            value: git-clone
+          - name: version
+            value: "0.9"
+      workspaces:
+        - name: output
+          workspace: data
+      params:
+        - name: url
+          value: $(params.repo-url)
+
+    - name: nixos-build-image
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: nixos-build-image
+      workspaces:
+        - name: source
+          workspace: data
+      params:
+        - name: flakePath
+          value: ".#devContainerImage"
+        - name: imageVariant
+          value: kubevirt
+        - name: outputFile
+          value: test
+
+    - name: build-push-rootdisk
+      runAfter: ["nixos-build-image"]
+      taskRef:
+        name: buildkit-build-push
+      workspaces:
+        - name: source
+          workspace: data
+      params:
+        - name: DOCKERFILE
+          value: Dockerfile.rootdisk
+        - name: IMAGE
+          value: harbor.salami.network/kubevirt-rootdisks/nixos:latest
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: nixos-build-image
+spec:
+  params:
+    - name: flakePath
+    - name: imageVariant
+    - name: outputFile
+  workspaces:
+    - name: source
+  steps:
+    - name: build
+      image: nixos/nix:2.33.5
+      env:
+        - name: NIX_CONFIG
+          value: |
+            experimental-features = nix-command flakes
+            system-features = kvm benchmark big-parallel nixos-test uid-range
+      script: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        export HOME=/tmp
+        mkdir -p "$HOME/.config/git"
+        cat > "$HOME/.config/git/config" <<EOF
+        [safe]
+          directory = *
+        EOF
+
+        cd $(workspaces.source.path)
+
+        nix build $(params.flakePath) -o ./out --print-out-paths
+        ls -la ./out
+        ls -L ./out
+
+        cp -L ./out/*.qcow2 .
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: buildkit-build-push
+spec:
+  params:
+    - name: IMAGE
+    - name: DOCKERFILE
+      default: Dockerfile
+    - name: CONTEXT
+      default: .
+  workspaces:
+    - name: source
+  steps:
+    - name: build-and-push
+      image: moby/buildkit:v0.29.0
+      workingDir: $(workspaces.source.path)
+      securityContext:
+        privileged: true
+      script: |
+        #!/usr/bin/env sh
+        set -eu
+        buildctl-daemonless.sh build \
+          --frontend=dockerfile.v0 \
+          --opt filename=$(params.DOCKERFILE) \
+          --local context=$(params.CONTEXT) \
+          --local dockerfile=$(params.CONTEXT) \
+          --output type=image,name=$(params.IMAGE),push=true
