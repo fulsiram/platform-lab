@@ -37,6 +37,13 @@
         };
       };
 
+      nixosConfigurations.devContainer = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./nix/hosts/dev/configuration.nix
+        ];
+      };
+
       checks.x86_64-linux = deploy-rs.lib.x86_64-linux.deployChecks self.deploy;
 
       formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt;
