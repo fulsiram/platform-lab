@@ -13,4 +13,4 @@ helmCharts:
 
 resources:
   - httproute.yaml
-  - admin-token-secret.yaml
+  - secrets.yaml
