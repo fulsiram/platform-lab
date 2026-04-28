@@ -7,10 +7,10 @@ spec:
   project: default
   sources:
     - repoURL: https://codecentric.github.io/helm-charts
-      path: keycloakx
-      targetRevision: v1.20.1
+      chart: keycloakx
+      targetRevision: 7.1.11
       helm:
-        releaseName: keycloai
+        releaseName: keycloak
         valueFiles:
           - $values/kubernetes/apps/keycloak/app/values.yaml
     - repoURL: https://github.com/fulsiram/homelab.git

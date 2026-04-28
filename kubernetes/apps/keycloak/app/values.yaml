@@ -40,9 +40,6 @@ extraEnv: |
         name: keycloak-db-app
         key: username
 
-dbchecker:
-  enabled: true
-
 db:
   vendor: postgres
   existingSecret: keycloak-db-app
