@@ -4,3 +4,7 @@ providers:
 
 gateway:
   enabled: false
+
+service:
+  spec:
+    externalTrafficPolicy: Local
