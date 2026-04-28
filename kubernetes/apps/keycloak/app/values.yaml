@@ -24,32 +24,10 @@ extraEnv: |
     value: https://auth.salami.network
   - name: KC_HOSTNAME_STRICT
     value: "true"
-  - name: KC_SPI_THEME_WELCOME_THEME
-    value: mywelcome
   - name: JAVA_OPTS_APPEND
     value: >-
       -XX:MaxRAMPercentage=50.0
       -Djgroups.dns.query={{ include "keycloak.fullname" . }}-headless
-
-extraVolumes: |
-  - name: welcome-theme
-    configMap:
-      name: keycloak-welcome-theme
-
-extraVolumeMounts: |
-  - name: welcome-theme
-    mountPath: /opt/keycloak/themes/mywelcome/welcome
-
-extraManifests:
-  - |
-    apiVersion: v1
-    kind: ConfigMap
-    metadata:
-      name: keycloak-welcome-theme
-    data:
-      theme.properties: |
-        parent=keycloak
-        redirectToAdmin=false
 
 httpRoute:
   enabled: true
