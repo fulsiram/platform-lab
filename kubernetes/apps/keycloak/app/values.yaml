@@ -24,16 +24,6 @@ extraEnv: |
     value: https://auth.salami.network
   - name: KC_HOSTNAME_STRICT
     value: "true"
-  - name: KC_BOOTSTRAP_ADMIN_USERNAME
-    valueFrom:
-      secretKeyRef:
-        name: {{ include "keycloak.fullname" . }}-admin-creds
-        key: user
-  - name: KC_BOOTSTRAP_ADMIN_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: {{ include "keycloak.fullname" . }}-admin-creds
-        key: password
   - name: JAVA_OPTS_APPEND
     value: >-
       -XX:MaxRAMPercentage=50.0
@@ -47,9 +37,3 @@ httpRoute:
       namespace: gateway-infra
   hostnames:
     - auth.salami.network
-
-secrets:
-  admin-creds:
-    stringData:
-      user: admin
-      password: secret
