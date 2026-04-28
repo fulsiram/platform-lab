@@ -6,8 +6,8 @@ resourceType: Deployment
 
 image:
   extraVars:
-    # - key: RSA_KEY_FILENAME
-    #   value: secrets/rsa_key
+    - key: RSA_KEY_FILENAME
+      value: /secrets/rsa_key
 
 extraVolumeMounts:
   - name: secrets-volume
