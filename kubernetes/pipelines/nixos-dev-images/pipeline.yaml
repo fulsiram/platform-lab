@@ -115,6 +115,7 @@ spec:
     - name: build-and-push
       image: moby/buildkit:v0.29.0
       workingDir: $(workspaces.source.path)
+      resources: {}
       securityContext:
         privileged: true
       script: |
