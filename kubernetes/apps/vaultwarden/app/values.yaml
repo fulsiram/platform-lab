@@ -4,9 +4,25 @@ domain: "https://warden.salami.network"
 
 resourceType: Deployment
 
+image:
+  extraVars:
+    # - key: RSA_KEY_FILENAME
+    #   value: secrets/rsa_key
+
+extraVolumeMounts:
+  - name: secrets-volume
+    mountPath: /secrets/rsa_key.pem
+    subPath: rsaKey
+    readOnly: true
+
+extraVolumes:
+  - name: secrets-volume
+    secret:
+      secretName: vaultwarden-secrets
+
 adminToken:
-  existingSecret: "vaultwarden-admin-token"
-  existingSecretKey: "token"
+  existingSecret: vaultwarden-secrets
+  existingSecretKey: "adminToken"
 
 database:
   type: postgresql
