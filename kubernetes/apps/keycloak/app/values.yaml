@@ -54,7 +54,7 @@ httpRoute:
     - name: gateway
       sectionName: https-wildcard
       namespace: gateway-infra
-  hosts:
+  hostnames:
     - auth.salami.network
 
   console:
@@ -63,7 +63,7 @@ httpRoute:
       - name: gateway
         sectionName: https-wildcard
         namespace: gateway-infra
-    hosts:
+    hostnames:
       - auth.salami.network
 
 secrets:
