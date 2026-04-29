@@ -48,6 +48,7 @@ overrides_config: |
     enable: true
     keys: /data/ssh-keys
   http:
+    external_port: 443
     certificate: /tls-cert/tls.crt
     key: /tls-cert/tls.key
   sso_providers:
