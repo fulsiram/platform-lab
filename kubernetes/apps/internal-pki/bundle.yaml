@@ -1,0 +1,15 @@
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: internal-ca
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  sources:
+    - secret:
+        name: selfsigned-ca
+        key: ca.crt
+  target:
+    configMap:
+      key: ca.crt
+    namespaceSelector: {}

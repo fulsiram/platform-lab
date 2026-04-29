@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: trust-manager
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: oci://quay.io/jetstack/charts/trust-manager
+      path: .
+      targetRevision: v0.22.1
+      helm:
+        releaseName: trust-manager
+        valueFiles:
+          - $values/kubernetes/apps/trust-manager/values.yaml
+    - repoURL: https://github.com/fulsiram/homelab.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      selfHeal: true
