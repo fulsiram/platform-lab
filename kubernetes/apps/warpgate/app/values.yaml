@@ -24,7 +24,28 @@ data:
     enabled: false
 
 ssh_keys_secret: "warpgate-ssh-keys"
-tls_cert_secret: "warpgate-tls"
+
+# `tls_cert_secret` intentionally unset: the chart copies the cert into /data,
+# then `warpgate unattended-setup` unconditionally overwrites it. Mount the
+# secret ourselves and point warpgate at it via overrides_config (applied
+# after setup).
+volumes:
+  - name: tls-cert
+    secret:
+      secretName: warpgate-tls
+volume_mounts:
+  - name: tls-cert
+    mountPath: /tls-cert
+    readOnly: true
+
+config_env_var_replace: "DATABASE_URL"
+overrides_config: |
+  database_url: $DATABASE_URL
+  ssh:
+    keys: /data/ssh-keys
+  http:
+    certificate: /tls-cert/tls.crt
+    key: /tls-cert/tls.key
 
 service:
   ports:
