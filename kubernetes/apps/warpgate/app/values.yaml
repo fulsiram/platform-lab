@@ -45,6 +45,7 @@ overrides_config: |
   external_host: warpgate.salami.network
   database_url: $DATABASE_URL
   ssh:
+    enable: true
     keys: /data/ssh-keys
   http:
     certificate: /tls-cert/tls.crt
