@@ -20,10 +20,8 @@ database:
   existingSecretKey: password
 
 extraEnv: |
-  - name: KC_HOSTNAME
-    value: https://auth.salami.network
   - name: KC_HOSTNAME_STRICT
-    value: "true"
+    value: "false"
   - name: JAVA_OPTS_APPEND
     value: >-
       -XX:MaxRAMPercentage=50.0
@@ -37,3 +35,30 @@ httpRoute:
       namespace: gateway-infra
   hostnames:
     - auth.salami.network
+    - keycloak.salami.network
+
+extraManifests:
+  - |
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      name: keycloak-root-redirect
+    spec:
+      parentRefs:
+        - name: gateway
+          sectionName: https-wildcard
+          namespace: gateway-infra
+      hostnames:
+        - auth.salami.network
+      rules:
+        - matches:
+            - path:
+                type: Exact
+                value: /
+          filters:
+            - type: RequestRedirect
+              requestRedirect:
+                path:
+                  type: ReplaceFullPath
+                  replaceFullPath: /realms/members/account/
+                statusCode: 302
