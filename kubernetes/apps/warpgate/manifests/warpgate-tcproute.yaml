@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: warpgate-ssh
+  namespace: warpgate
+spec:
+  parentRefs:
+    - name: gateway
+      namespace: gateway-infra
+      sectionName: ssh
+  rules:
+    - backendRefs:
+        - name: warpgate
+          port: 2222

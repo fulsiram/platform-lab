@@ -5,6 +5,14 @@ providers:
 gateway:
   enabled: false
 
+ports:
+  ssh:
+    port: 2222
+    exposedPort: 2222
+    protocol: TCP
+    expose:
+      default: true
+
 service:
   spec:
     externalTrafficPolicy: Local
