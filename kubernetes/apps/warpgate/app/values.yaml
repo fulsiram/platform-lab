@@ -4,7 +4,7 @@ image:
   pullPolicy: IfNotPresent
 
 setup:
-  enabled: true
+  enabled: false
   type: "podinit"
 
   http: 8888
@@ -16,6 +16,8 @@ setup:
   envFromSecret:
     WARPGATE_ADMIN_PASSWORD: warpgate-secret/adminPassword
     DATABASE_URL: warpgate-db-app/uri
+    KEYCLOAK_CLIENT_ID: warpgate-sso/clientId
+    KEYCLOAK_CLIENT_SECRET: warpgate-sso/clientSecret
 
   databaseUrl: "$DATABASE_URL"
 
@@ -38,14 +40,24 @@ volume_mounts:
     mountPath: /tls-cert
     readOnly: true
 
-config_env_var_replace: "DATABASE_URL"
+config_env_var_replace: "DATABASE_URL KEYCLOAK_CLIENT_ID KEYCLOAK_CLIENT_SECRET"
 overrides_config: |
+  external_host: warpgate.salami.network
   database_url: $DATABASE_URL
   ssh:
     keys: /data/ssh-keys
   http:
     certificate: /tls-cert/tls.crt
     key: /tls-cert/tls.key
+  sso_providers:
+    - name: keycloak
+      label: Keycloak
+      provider:
+        type: custom
+        client_id: $KEYCLOAK_CLIENT_ID
+        client_secret: $KEYCLOAK_CLIENT_SECRET
+        issuer_url: https://auth.salami.network/realms/members
+        scopes: ["openid", "profile", "email"]
 
 service:
   ports:
