@@ -51,6 +51,8 @@ overrides_config: |
     external_port: 443
     certificate: /tls-cert/tls.crt
     key: /tls-cert/tls.key
+  recordings:
+    enable: true
   sso_providers:
     - name: keycloak
       label: Keycloak
