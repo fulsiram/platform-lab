@@ -52,6 +52,7 @@ overrides_config: |
   sso_providers:
     - name: keycloak
       label: Keycloak
+      auto_create_users: true
       provider:
         type: custom
         client_id: $KEYCLOAK_CLIENT_ID
