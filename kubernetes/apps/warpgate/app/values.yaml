@@ -24,6 +24,7 @@ data:
     enabled: false
 
 ssh_keys_secret: "warpgate-ssh-keys"
+tls_cert_secret: "warpgate-tls"
 
 service:
   ports:
