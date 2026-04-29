@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: warpgate
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: oci://ghcr.io/warp-tech/helm-charts/warpgate
+      path: .
+      targetRevision: 0.0.2
+      helm:
+        releaseName: warpgate
+        valueFiles:
+          - $values/kubernetes/apps/warpgate/app/values.yaml
+    - repoURL: https://github.com/fulsiram/homelab.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://github.com/fulsiram/homelab.git
+      targetRevision: main
+      path: kubernetes/apps/warpgate/secrets
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: warpgate
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: warpgate-db
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/fulsiram/homelab.git
+    path: kubernetes/apps/warpgate/db/
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: warpgate
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

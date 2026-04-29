@@ -1,0 +1,38 @@
+setup:
+  enabled: true
+  type: "podinit"
+
+  http: 8888
+  ssh: 2222
+  mysql: 0
+  pgsql: 0
+  kubernetes: 0
+
+  envFromSecret:
+    WARPGATE_ADMIN_PASSWORD: warpgate-secret/adminPassword
+    DATABASE_URL: warpgate-db-app/uri
+
+  databaseUrl: "$DATABASE_URL"
+
+data:
+  pvc:
+    enabled: false
+
+ssh_keys_secret: "warpgate-ssh-keys"
+
+service:
+  ports:
+    http: 8888
+    ssh: 2222
+    mysql: 0
+    pgsql: 0
+    kubernetes: 0
+
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: gateway
+      namespace: gateway-infra
+      sectionName: https-wildcard
+  hostnames:
+    - warpgate.salami.network
