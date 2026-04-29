@@ -23,7 +23,13 @@ setup:
 
 data:
   pvc:
-    enabled: false
+    enabled: true
+    template:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 50Gi
 
 ssh_keys_secret: "warpgate-ssh-keys"
 
