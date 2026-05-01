@@ -1,0 +1,20 @@
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: warpgate-provider
+spec:
+  package: ghcr.io/fulsiram/provider-upjet-warpgate:v0.1.0
+
+---
+apiVersion: warpgate.m.salami.network/v1beta1
+kind: ClusterProviderConfig
+metadata:
+  name: default
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      name: warpgate-creds
+      namespace: crossplane-system
+      key: credentials
