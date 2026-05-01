@@ -3,6 +3,12 @@ global:
 
 configs:
   cm:
+    application.resourceTrackingMethod: annotation
+    resource.exclusions: |
+      - apiGroups:
+        - "*"
+        kinds:
+        - ProviderConfigUsage
     kustomize.buildOptions: --enable-helm
   params:
     server.insecure: true
