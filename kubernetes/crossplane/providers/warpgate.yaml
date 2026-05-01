@@ -10,6 +10,8 @@ spec:
 apiVersion: warpgate.m.salami.network/v1beta1
 kind: ClusterProviderConfig
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
   name: default
 spec:
   credentials:
