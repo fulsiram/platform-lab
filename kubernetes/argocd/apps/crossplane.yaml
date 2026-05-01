@@ -30,14 +30,17 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: crossplane-providers
+  name: crossplane-packages
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: https://github.com/fulsiram/homelab.git
-    path: kubernetes/crossplane/providers/
-    targetRevision: main
+  sources:
+    - repoURL: https://github.com/fulsiram/homelab.git
+      path: kubernetes/crossplane/providers/
+      targetRevision: main
+    - repoURL: https://github.com/fulsiram/homelab.git
+      path: kubernetes/crossplane/functions/
+      targetRevision: main
   destination:
     server: https://kubernetes.default.svc
     namespace: crossplane-system
