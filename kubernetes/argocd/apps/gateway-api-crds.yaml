@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/kubernetes-sigs/gateway-api.git
-    targetRevision: v1.4.0
-    path: config/crd/experimental
+    repoURL: https://github.com/fulsiram/homelab.git
+    path: kubernetes/apps/gateway-api-crds/app/
+    targetRevision: main
   destination:
     server: https://kubernetes.default.svc
     namespace: default
