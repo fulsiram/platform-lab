@@ -1,0 +1,19 @@
+ipv4:
+  enabled: true
+ipv6:
+  enabled: true
+
+ipam:
+  mode: cluster-pool
+  operator:
+    clusterPoolIPv4PodCIDRList:
+      - 10.12.0.0/16
+    clusterPoolIPv4MaskSize: 22
+
+    clusterPoolIPv6PodCIDRList:
+      - fd4f:d0b5:c2ab:0000::/56
+    clusterPoolIPv6MaskSize: 64
+
+hubble:
+  relay:
+    enabled: true
