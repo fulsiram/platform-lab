@@ -1,3 +1,5 @@
+kubeProxyReplacement: true
+
 ipv4:
   enabled: true
 ipv6:
