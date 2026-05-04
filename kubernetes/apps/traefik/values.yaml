@@ -15,5 +15,7 @@ ports:
       default: true
 
 service:
+  type: LoadBalancer
+  loadBalancerClass: io.cilium/node
   spec:
     externalTrafficPolicy: Local
