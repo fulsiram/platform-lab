@@ -47,7 +47,9 @@
     checkReversePath = false;
   };
 
-  networking.firewall.extraInputRules = ''
-    iifname "cni0" tcp dport 10250 accept
-  '';
+  networking.firewall.trustedInterfaces = [
+    "cilium_host"
+    "cilium_net"
+    "lxc*"
+  ];
 }
