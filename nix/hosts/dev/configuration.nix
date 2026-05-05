@@ -1,5 +1,9 @@
-{ ... }:
+{ modulesPath, ... }:
 {
+  imports = [
+    "${modulesPath}/virtualisation/kubevirt.nix"
+  ];
+
   services.openssh.enable = true;
 
   users.users.user = {
