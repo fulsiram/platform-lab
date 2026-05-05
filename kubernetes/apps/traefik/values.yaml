@@ -20,3 +20,6 @@ service:
     loadBalancerClass: io.cilium/node
     externalTrafficPolicy: Local
     ipFamilyPolicy: PreferDualStack
+    ipFamilies:
+      - IPv4
+      - IPv6
