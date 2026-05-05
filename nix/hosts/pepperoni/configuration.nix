@@ -16,12 +16,19 @@
   };
 
   services.openssh.enable = true;
+
   services.k3s.enable = true;
   services.k3s.extraFlags = [
     "--cluster-init"
+    "--flannel-backend=none"
+    "--disable-kube-proxy"
+    "--disable-network-policy"
     "--tls-san=pepperoni.salami.network"
   ];
-  services.k3s.disable = [ "traefik" ];
+  services.k3s.disable = [
+    "traefik"
+    "servicelb"
+  ];
 
   environment.systemPackages = with pkgs; [
     curl
@@ -29,6 +36,7 @@
     git
     htop
     tmux
+    tcpdump
   ];
 
   users.users.admin = {

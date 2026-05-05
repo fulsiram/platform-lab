@@ -44,6 +44,7 @@
       443
       6443
     ];
+    checkReversePath = false;
   };
 
   networking.firewall.extraInputRules = ''
