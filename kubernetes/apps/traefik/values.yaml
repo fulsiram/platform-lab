@@ -19,3 +19,4 @@ service:
     type: LoadBalancer
     loadBalancerClass: io.cilium/node
     externalTrafficPolicy: Local
+    ipFamilyPolicy: PreferDualStack
