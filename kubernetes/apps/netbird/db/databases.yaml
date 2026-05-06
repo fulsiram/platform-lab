@@ -1,0 +1,21 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: netbird-events
+spec:
+  cluster:
+    name: netbird-db
+  name: netbird_events
+  owner: netbird
+
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: netbird-idp
+spec:
+  cluster:
+    name: netbird-db
+  name: netbird_idp
+  owner: netbird

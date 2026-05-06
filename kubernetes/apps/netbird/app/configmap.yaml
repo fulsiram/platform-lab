@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: netbird-server-config
+data:
+  config.yaml.tmpl: |
+    server:
+      listenAddress: ":80"
+      exposedAddress: "https://netbird.salami.network:443"
+      metricsPort: 9090
+      healthcheckAddress: ":9000"
+      logLevel: "info"
+      logFile: "console"
+
+      authSecret: "${NB_AUTH_SECRET}"
+      dataDir: "/var/lib/netbird/"
+
+      disableAnonymousMetrics: true
+      disableGeoliteUpdate: false
+
+      reverseProxy:
+        trustedHTTPProxiesCount: 1
+
+      auth:
+        issuer: "https://netbird.salami.network/oauth2"
+        localAuthDisabled: false
+        signKeyRefreshEnabled: true
+        dashboardRedirectURIs:
+          - "https://netbird.salami.network/nb-auth"
+          - "https://netbird.salami.network/nb-silent-auth"
+        cliRedirectURIs:
+          - "http://localhost:53000/"
+
+      store:
+        engine: "postgres"
+        dsn: "${NB_STORE_DSN}"
+        encryptionKey: "${NB_STORE_ENCRYPTION_KEY}"
+
+      activityStore:
+        engine: "postgres"
+        dsn: "${NB_ACTIVITY_DSN}"
+
+      authStore:
+        engine: "postgres"
+        dsn: "${NB_AUTHSTORE_DSN}"
