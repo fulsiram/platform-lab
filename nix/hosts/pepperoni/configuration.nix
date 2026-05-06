@@ -24,6 +24,8 @@
     "--disable-kube-proxy"
     "--disable-network-policy"
     "--tls-san=pepperoni.salami.network"
+    "--cluster-cidr=10.42.0.0/16,fdd2:3f8b:6035:1::/56"
+    "--service-cidr=10.43.0.0/16,fdd2:3f8b:6035:2::/112"
   ];
   services.k3s.disable = [
     "traefik"
