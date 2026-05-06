@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wireguard
+  labels:
+    app.kubernetes.io/name: wireguard
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wireguard
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wireguard
+    spec:
+      containers:
+        - name: wireguard
+          image: lscr.io/linuxserver/wireguard:1.0.20250521-r1-ls110
+          ports:
+            - name: wg
+              containerPort: 51820
+              protocol: UDP
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          volumeMounts:
+            - name: wg-conf
+              mountPath: /config/wg_confs
+              readOnly: true
+      volumes:
+        - name: wg-conf
+          secret:
+            secretName: wireguard-conf
+            items:
+              - key: wg0.conf
+                path: wg0.conf

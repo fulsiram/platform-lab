@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: akaia-peering
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/fulsiram/homelab.git
+    path: kubernetes/apps/akaia-peering/app/
+    targetRevision: main
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: akaia-peering
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
