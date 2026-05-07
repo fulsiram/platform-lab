@@ -14,6 +14,9 @@ ipv6:
 operator:
   replicas: 1
 
+socketLB:
+  hostNamespaceOnly: true
+
 ipam:
   mode: cluster-pool
   operator:
