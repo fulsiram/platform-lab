@@ -17,7 +17,7 @@
 
   boot.loader.grub.efiSupport = true;
   boot.loader.grub.efiInstallAsRemovable = true;
-  boot.loader.grub.device = "/dev/vda";
+  boot.loader.grub.device = "nodev";
 
   services.qemuGuest.enable = true;
   services.openssh.enable = true;
