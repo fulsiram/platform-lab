@@ -3,8 +3,8 @@
     root = {
       type = "disk";
       device = "/dev/disk/by-label/nixos";
-
       imageSize = "10G";
+      imageFormat = "qcow2";
       content = {
         type = "gpt";
         partitions = {
@@ -38,6 +38,7 @@
       type = "disk";
       device = "/dev/disk/by-id/virito-NIXSTORE";
       imageSize = "10G";
+      imageFormat = "qcow2";
       content = {
         type = "gpt";
         partitions = {
