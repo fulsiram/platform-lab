@@ -1,0 +1,3 @@
+FROM scratch
+ARG DISK_FILE
+ADD --chown=107:107 ${DISK_FILE} /disk/

@@ -1,3 +1,0 @@
-FROM scratch
-ADD --chown=107:107 *.qcow2 /disk/
-

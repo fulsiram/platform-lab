@@ -53,9 +53,27 @@ spec:
           workspace: data
       params:
         - name: DOCKERFILE
-          value: Dockerfile.rootdisk
+          value: Dockerfile.containerdisk
         - name: IMAGE
           value: harbor.salami.network/kubevirt-rootdisks/nixos:latest
+        - name: BUILD_ARGS
+          value: --opt build-arg:DISK_FILE=root.qcow2
+
+    - name: build-push-nixdisk
+      runAfter: ["nixos-build-image"]
+      taskRef:
+        kind: Task
+        name: buildkit-build-push
+      workspaces:
+        - name: source
+          workspace: data
+      params:
+        - name: DOCKERFILE
+          value: Dockerfile.containerdisk
+        - name: IMAGE
+          value: harbor.salami.network/kubevirt-rootdisks/nixos-nix:latest
+        - name: BUILD_ARGS
+          value: --opt build-arg:DISK_FILE=nix.qcow2
 
 ---
 apiVersion: tekton.dev/v1beta1
@@ -98,7 +116,7 @@ spec:
         ls -la ./out
         ls -la ./out/
 
-        cp -L ./out/*.qcow2 .
+        cp -L ./out/* .
 
 ---
 apiVersion: tekton.dev/v1beta1
@@ -115,6 +133,9 @@ spec:
     - name: CONTEXT
       type: string
       default: .
+    - name: BUILD_ARGS
+      type: string
+      default: ""
   workspaces:
     - name: source
   steps:
@@ -132,4 +153,5 @@ spec:
           --opt filename=$(params.DOCKERFILE) \
           --local context=$(params.CONTEXT) \
           --local dockerfile=$(params.CONTEXT) \
+          $(params.BUILD_ARGS) \
           --output type=image,name=$(params.IMAGE),push=true
