@@ -5,7 +5,7 @@
     root = {
       type = "disk";
       device = "/dev/disk/by-label/nixos";
-      imageSize = "10G";
+      imageSize = "1G";
       content = {
         type = "gpt";
         partitions = {
@@ -38,7 +38,7 @@
     nix = {
       type = "disk";
       device = "/dev/disk/by-id/virito-NIXSTORE";
-      imageSize = "10G";
+      imageSize = "3G";
       content = {
         type = "gpt";
         partitions = {
