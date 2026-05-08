@@ -38,7 +38,7 @@
     nix = {
       type = "disk";
       device = "/dev/disk/by-id/virtio-NIXSTORE";
-      imageSize = "3G";
+      imageSize = "8G";
       content = {
         type = "gpt";
         partitions = {
