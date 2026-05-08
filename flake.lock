@@ -26,11 +26,11 @@
       "flake": false,
       "locked": {
         "dir": "nix/configs/akaia",
-        "lastModified": 1778230675,
-        "narHash": "sha256-THJKYY75/8HkIMSWROz6Vu5D6xilOlX1eO6Xu/ONL7o=",
+        "lastModified": 1778276243,
+        "narHash": "sha256-kXAR6NC6SPknhpokOn9WgzHX5nw07d3BraKW81oeLS0=",
         "owner": "fulsiram",
         "repo": "homelab",
-        "rev": "80c0a4cb64372997d48db62f247787e976a6170f",
+        "rev": "469c236a72fe2c718e72478f535d578418812338",
         "type": "github"
       },
       "original": {
@@ -53,11 +53,11 @@
       },
       "locked": {
         "dir": "nix/dev-base",
-        "lastModified": 1778230675,
-        "narHash": "sha256-THJKYY75/8HkIMSWROz6Vu5D6xilOlX1eO6Xu/ONL7o=",
+        "lastModified": 1778276243,
+        "narHash": "sha256-kXAR6NC6SPknhpokOn9WgzHX5nw07d3BraKW81oeLS0=",
         "owner": "fulsiram",
         "repo": "homelab",
-        "rev": "80c0a4cb64372997d48db62f247787e976a6170f",
+        "rev": "469c236a72fe2c718e72478f535d578418812338",
         "type": "github"
       },
       "original": {
