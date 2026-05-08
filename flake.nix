@@ -51,7 +51,23 @@
       # };
 
       nixosConfigurations.akaia = kickstart.nixosConfigurations.dev-kickstart.extendModules {
-        modules = [ ./nix/hosts/akaia/configuration.nix ];
+        modules = [
+          ./nix/hosts/akaia/configuration.nix
+          (
+            {
+              pkgs,
+              lib,
+              ...
+            }:
+            {
+              system.bakedFlake = pkgs.runCommand "akaia-flake" { } ''
+                cp -r ${kickstart}/. $out/
+                chmod -R u+w $out
+                cp ${./nix/hosts/akaia/configuration.nix} $out/configuration.nix
+              '';
+            }
+          )
+        ];
       };
 
       packages.x86_64-linux.akaiaImages = self.nixosConfigurations.akaia.config.system.build.diskoImages;

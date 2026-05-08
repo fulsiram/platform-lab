@@ -23,7 +23,12 @@
           disko.nixosModules.disko
           base.nixosModules.base
           base.nixosModules.bakeFlake
-          { system.bakedFlake = self; }
+          (
+            { lib, ... }:
+            {
+              system.bakedFlake = lib.mkDefault self;
+            }
+          )
           (if builtins.pathExists /etc/nixos/configuration.nix then /etc/nixos/configuration.nix else { })
         ];
       };
