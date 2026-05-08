@@ -1,5 +1,6 @@
 {
   modulesPath,
+  pkgs,
   ...
 }:
 {
@@ -20,6 +21,28 @@
   services.openssh.enable = true;
   services.cloud-init.enable = true;
   systemd.services."serial-getty@ttyS0".enable = true;
+
+  systemd.services.grow-partitions = {
+    wantedBy = [ "multi-user.target" ];
+    after = [ "nix.mount" ];
+    requires = [ "nix.mount" ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      SuccessExitStatus = "0 1";
+    };
+
+    path = with pkgs; [
+      cloud-utils.guest
+      e2fsprogs
+    ];
+
+    script = ''
+      growpart /dev/disk/by-id/virtio-NIXSTORE 1 || true;
+      resize2fs /dev/disk/by-id/virtio-NIXSTORE-part1
+    '';
+  };
 
   fileSystems."/secrets/yggdrasil" = {
     fsType = "virtiofs";
