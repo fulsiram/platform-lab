@@ -33,7 +33,12 @@
           (
             { lib, ... }:
             {
-              system.bakedFlake = lib.mkDefault self;
+              system.bakedFlake = lib.mkDefault (
+                base.lib.mkBakedFlake {
+                  source = self;
+                  files = [ "configuration.nix" ];
+                }
+              );
             }
           )
           (if builtins.pathExists /etc/nixos/configuration.nix then /etc/nixos/configuration.nix else { })

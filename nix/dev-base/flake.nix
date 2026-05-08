@@ -7,6 +7,7 @@
   outputs =
     inputs@{
       self,
+      pkgs,
       nixpkgs,
       disko,
     }:
@@ -15,6 +16,11 @@
         base = ./modules/base.nix;
         diskLayout = ./modules/disk-config.nix;
         bakeFlake = ./modules/bake-flake.nix;
+      };
+
+      lib = import ./lib.nix {
+        pkgs = pkgs;
+        lib = nixpkgs.lib;
       };
 
       nixosConfigurations.base = nixpkgs.lib.nixosSystem {
