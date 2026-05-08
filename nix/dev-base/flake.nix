@@ -7,7 +7,6 @@
   outputs =
     inputs@{
       self,
-      pkgs,
       nixpkgs,
       disko,
     }:
@@ -19,7 +18,7 @@
       };
 
       lib = import ./lib.nix {
-        pkgs = pkgs;
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
         lib = nixpkgs.lib;
       };
 
