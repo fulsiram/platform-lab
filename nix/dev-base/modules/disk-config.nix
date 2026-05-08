@@ -37,7 +37,7 @@
 
     nix = {
       type = "disk";
-      device = "/dev/disk/by-id/virito-NIXSTORE";
+      device = "/dev/disk/by-id/virtio-NIXSTORE";
       imageSize = "3G";
       content = {
         type = "gpt";
