@@ -5,9 +5,9 @@
     deploy-rs.url = "github:serokell/deploy-rs";
     sops-nix.url = "github:Mic92/sops-nix";
 
-    kickstart.url = "path:./nix/dev-kickstart";
-    kickstart.inputs.nixpkgs.follows = "nixpkgs";
-    kickstart.inputs.disko.follows = "disko";
+    akaia.url = "path:./nix/configs/akaia";
+    akaia.inputs.nixpkgs.follows = "nixpkgs";
+    akaia.inputs.disko.follows = "disko";
   };
 
   outputs =
@@ -17,7 +17,7 @@
       disko,
       deploy-rs,
       sops-nix,
-      kickstart,
+      akaia,
     }:
     {
       nixosConfigurations.pepperoni = nixpkgs.lib.nixosSystem {
@@ -42,34 +42,7 @@
         };
       };
 
-      # nixosConfigurations.devContainer = nixpkgs.lib.nixosSystem {
-      #   system = "x86_64-linux";
-      #   modules = [
-      #     disko.nixosModules.disko
-      #     ./nix/hosts/dev/configuration.nix
-      #   ];
-      # };
-
-      nixosConfigurations.akaia = kickstart.nixosConfigurations.dev-kickstart.extendModules {
-        modules = [
-          ./nix/hosts/akaia/configuration.nix
-          (
-            {
-              pkgs,
-              lib,
-              ...
-            }:
-            {
-              system.bakedFlake = pkgs.runCommand "akaia-flake" { } ''
-                cp -r ${kickstart}/. $out/
-                chmod -R u+w $out
-                cp ${./nix/hosts/akaia/configuration.nix} $out/configuration.nix
-              '';
-            }
-          )
-        ];
-      };
-
+      nixosConfigurations.akaia = akaia.nixosConfigurations.system;
       packages.x86_64-linux.akaiaImages = self.nixosConfigurations.akaia.config.system.build.diskoImages;
 
       checks.x86_64-linux = deploy-rs.lib.x86_64-linux.deployChecks self.deploy;
