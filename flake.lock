@@ -1,23 +1,62 @@
 {
   "nodes": {
-    "base": {
+    "akaia": {
       "inputs": {
+        "akaia": "akaia_2",
+        "base": "base",
         "disko": [
-          "kickstart",
           "disko"
         ],
         "nixpkgs": [
-          "kickstart",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./nix/configs/akaia",
+        "type": "path"
+      },
+      "original": {
+        "path": "./nix/configs/akaia",
+        "type": "path"
+      },
+      "parent": []
+    },
+    "akaia_2": {
+      "flake": false,
+      "locked": {
+        "dir": "nix/configs/akaia",
+        "lastModified": 1778222208,
+        "narHash": "sha256-G2/ynmMf9r5/mAYFNt4Kz3kJ97uO2uO79Zm+3Oxx6ZA=",
+        "owner": "fulsiram",
+        "repo": "homelab",
+        "rev": "6649fe050e831c305b6d44b082868057451669f0",
+        "type": "github"
+      },
+      "original": {
+        "dir": "nix/configs/akaia",
+        "owner": "fulsiram",
+        "repo": "homelab",
+        "type": "github"
+      }
+    },
+    "base": {
+      "inputs": {
+        "disko": [
+          "akaia",
+          "disko"
+        ],
+        "nixpkgs": [
+          "akaia",
           "nixpkgs"
         ]
       },
       "locked": {
         "dir": "nix/dev-base",
-        "lastModified": 1778215210,
-        "narHash": "sha256-WkvF8H6eU6G3KFAtoDVeYcGE9RPrBnF8ILjz/6DTCg4=",
+        "lastModified": 1778222208,
+        "narHash": "sha256-G2/ynmMf9r5/mAYFNt4Kz3kJ97uO2uO79Zm+3Oxx6ZA=",
         "owner": "fulsiram",
         "repo": "homelab",
-        "rev": "60496b67dc7a1ef2dbd82c71b3a4e18aa63d3ddf",
+        "rev": "6649fe050e831c305b6d44b082868057451669f0",
         "type": "github"
       },
       "original": {
@@ -80,26 +119,6 @@
         "repo": "flake-compat",
         "type": "github"
       }
-    },
-    "kickstart": {
-      "inputs": {
-        "base": "base",
-        "disko": [
-          "disko"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "path": "./nix/dev-kickstart",
-        "type": "path"
-      },
-      "original": {
-        "path": "./nix/dev-kickstart",
-        "type": "path"
-      },
-      "parent": []
     },
     "nixpkgs": {
       "locked": {
@@ -167,9 +186,9 @@
     },
     "root": {
       "inputs": {
+        "akaia": "akaia",
         "deploy-rs": "deploy-rs",
         "disko": "disko",
-        "kickstart": "kickstart",
         "nixpkgs": "nixpkgs_3",
         "sops-nix": "sops-nix"
       }

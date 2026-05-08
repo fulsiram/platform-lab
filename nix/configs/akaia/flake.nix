@@ -5,9 +5,11 @@
     base.url = "github:fulsiram/homelab?dir=nix/dev-base";
     base.inputs.nixpkgs.follows = "nixpkgs";
     base.inputs.disko.follows = "disko";
-    akaia.url = "github:fulsiram/homelab?dir=nix/configs/akaia";
-    akaia.inputs.nixpkgs.follows = "nixpkgs";
-    akaia.inputs.disko.follows = "disko";
+
+    akaia = {
+      url = "github:fulsiram/homelab?dir=nix/configs/akaia";
+      flake = false;
+    };
   };
 
   outputs =
