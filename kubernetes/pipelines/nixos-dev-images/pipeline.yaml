@@ -37,7 +37,7 @@ spec:
           workspace: data
       params:
         - name: flakePath
-          value: ".#devContainerImage"
+          value: ".#nixosConfigurations.devContainer.config.system.build.diskoImagesScript"
         - name: imageVariant
           value: kubevirt
         - name: outputFile
@@ -94,7 +94,7 @@ spec:
 
         cd $(workspaces.source.path)
 
-        nix build $(params.flakePath) -o ./out --print-out-paths
+        nix build $(params.flakePath) -o ./out --print-out-paths --max-jobs auto --cores 0
         ls -la ./out
         ls -L ./out
 
