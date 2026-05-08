@@ -37,7 +37,7 @@ spec:
           workspace: data
       params:
         - name: flakePath
-          value: ".#nixosConfigurations.devContainer.config.system.build.diskoImages"
+          value: ".#akaiaImages"
         - name: imageVariant
           value: kubevirt
         - name: outputFile
