@@ -1,10 +1,25 @@
-{ modulesPath, ... }:
+{
+  modulesPath,
+  ...
+}:
 {
   imports = [
-    "${modulesPath}/virtualisation/kubevirt.nix"
+    "${modulesPath}/profiles/qemu-guest.nix"
+    ./disk-config.nix
   ];
 
+  boot.growPartition = true;
+  boot.kernelParams = [ "console=ttyS0" ];
+  boot.loader.timeout = 0;
+
+  boot.loader.grub.efiSupport = true;
+  boot.loader.grub.efiInstallAsRemovable = true;
+  boot.loader.grub.device = "/dev/vda";
+
+  services.qemuGuest.enable = true;
   services.openssh.enable = true;
+  services.cloud-init.enable = true;
+  systemd.services."serial-getty@ttyS0".enable = true;
 
   fileSystems."/secrets/yggdrasil" = {
     fsType = "virtiofs";
