@@ -1,4 +1,5 @@
 {
+  lib,
   ...
 }:
 {
@@ -8,6 +9,7 @@
   };
 
   services.yggdrasil = {
+    persistentKeys = false;
     enable = true;
     settings.Peers = [
       # akaia.org
