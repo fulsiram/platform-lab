@@ -90,10 +90,29 @@ spec:
       type: string
   workspaces:
     - name: source
+  volumes:
+    - name: nix-cache
+      persistentVolumeClaim:
+        claimName: nixos-nix-cache
   steps:
+    - name: seed-nix-cache
+      image: nixos/nix:2.33.5
+      volumeMounts:
+        - name: nix-cache
+          mountPath: /nix-cache
+      resources: {}
+      script: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+        if [ ! -e /nix-cache/store ]; then
+          cp -a /nix/. /nix-cache/
+        fi
     - name: build
       image: nixos/nix:2.33.5
       resources: {}
+      volumeMounts:
+        - name: nix-cache
+          mountPath: /nix
       env:
         - name: NIX_CONFIG
           value: |
