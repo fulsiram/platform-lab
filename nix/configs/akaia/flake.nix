@@ -6,6 +6,8 @@
     base.inputs.nixpkgs.follows = "nixpkgs";
     base.inputs.disko.follows = "disko";
 
+    continuity-os.url = "git+https://codeberg.org/Akaia_Collective/continuity_os?dir=system/nixos";
+
     akaia = {
       url = "github:fulsiram/homelab?dir=nix/configs/akaia";
       flake = false;
@@ -19,6 +21,7 @@
       disko,
       base,
       akaia,
+      continuity-os,
       ...
     }:
     {
@@ -29,6 +32,8 @@
           disko.nixosModules.disko
           base.nixosModules.base
           base.nixosModules.bakeFlake
+          continuity-os.nixosModules.default
+          "${akaia}/policy.nix"
           "${akaia}/configuration.nix"
           (
             { lib, ... }:
