@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   ...
 }:
 {
@@ -33,6 +34,10 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAjv/S+sOP+W+PUQBLpJFfczqWFfgzeWczaw0wszMrbK shadowfox@san-ti-hub"
     ];
   };
+
+  environment.systemPackages = with pkgs; [
+    git
+  ];
 
   security.sudo.wheelNeedsPassword = false;
 }
