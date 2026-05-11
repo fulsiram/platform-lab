@@ -38,7 +38,7 @@
           impermanence.nixosModules.impermanence
           continuity-os.nixosModules.default
           "${akaia}/policy.nix"
-          "${akaia}/configuration.nix"
+          ./configuration.nix
           (
             { lib, ... }:
             {
@@ -50,7 +50,6 @@
               );
             }
           )
-          (if builtins.pathExists /etc/nixos/configuration.nix then /etc/nixos/configuration.nix else { })
         ];
       };
     };
