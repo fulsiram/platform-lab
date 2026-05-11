@@ -24,6 +24,13 @@
   services.cloud-init.enable = true;
   systemd.services."serial-getty@ttyS0".enable = true;
 
+  fileSystems."/persistent" = {
+    device = "/dev/disk/by-id/virtio-PERSISTENT";
+    fsType = "ext4";
+    autoFormat = true;
+    autoResize = true;
+  };
+
   systemd.services.grow-partitions = {
     wantedBy = [ "multi-user.target" ];
     after = [ "nix.mount" ];
@@ -50,6 +57,7 @@
     "nix-command"
     "flakes"
   ];
+
   nix.registry = lib.mapAttrs (_: v: { flake = v; }) inputs;
   nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
   system.extraDependencies = lib.attrValues inputs;
