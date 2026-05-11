@@ -27,6 +27,7 @@
   fileSystems."/persistent" = {
     device = "/dev/disk/by-id/virtio-PERSISTENT";
     fsType = "ext4";
+    neededForBoot = true;
     autoFormat = true;
     autoResize = true;
   };
