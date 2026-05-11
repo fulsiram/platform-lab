@@ -6,6 +6,8 @@
     base.inputs.nixpkgs.follows = "nixpkgs";
     base.inputs.disko.follows = "disko";
 
+    impermanence.url = "github:nix-community/impermanence";
+
     continuity-os.url = "git+https://codeberg.org/Akaia_Collective/continuity_os?dir=system/nixos";
 
     akaia = {
@@ -22,6 +24,7 @@
       base,
       akaia,
       continuity-os,
+      impermanence,
       ...
     }:
     {
@@ -32,6 +35,7 @@
           disko.nixosModules.disko
           base.nixosModules.base
           base.nixosModules.bakeFlake
+          impermanence.nixosModules.impermanence
           continuity-os.nixosModules.default
           "${akaia}/policy.nix"
           "${akaia}/configuration.nix"
@@ -49,7 +53,5 @@
           (if builtins.pathExists /etc/nixos/configuration.nix then /etc/nixos/configuration.nix else { })
         ];
       };
-
-      packages.x86_64-linux.image = self.nixosConfigurations.system.config.system.build.diskoImages;
     };
 }

@@ -39,5 +39,10 @@
     git
   ];
 
+  environment.persistence."/persistent" = {
+    enable = true;
+    hideMounts = true;
+  };
+
   security.sudo.wheelNeedsPassword = false;
 }
