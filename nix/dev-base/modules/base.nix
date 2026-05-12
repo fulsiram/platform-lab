@@ -24,6 +24,8 @@
   services.cloud-init.enable = true;
   systemd.services."serial-getty@ttyS0".enable = true;
 
+  services.userborn.enable = true;
+
   fileSystems."/persistent" = {
     device = "/dev/disk/by-id/virtio-PERSISTENT";
     fsType = "ext4";
