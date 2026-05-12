@@ -37,7 +37,7 @@ spec:
           workspace: data
       params:
         - name: flakePath
-          value: "./nix/configs/akaia#akaiaImages"
+          value: "./nix/configs/akaia#images"
         - name: imageVariant
           value: kubevirt
         - name: outputFile
