@@ -111,7 +111,7 @@ spec:
       image: nixos/nix:2.33.5
       resources:
         limits:
-          devic.es/kvm: 1
+          devic.es/kvm: "1"
       volumeMounts:
         - name: nix-cache
           mountPath: /nix
