@@ -4,11 +4,11 @@
       "flake": false,
       "locked": {
         "dir": "nix/configs/akaia",
-        "lastModified": 1779485075,
-        "narHash": "sha256-VKnvKRER9vQb000p5Rh/EP8Owq9tGQBEF9Yiqxswg6k=",
+        "lastModified": 1779486800,
+        "narHash": "sha256-wnpwzzVF7rv/l28qAXhnNl/1k5ddV1NLVy4yaZopX9g=",
         "owner": "fulsiram",
         "repo": "homelab",
-        "rev": "ccb1bdb280d4e15ad425361f248be375c52cc8e9",
+        "rev": "79321c1fb633141015985c4533a2f29d123136c9",
         "type": "github"
       },
       "original": {
@@ -29,11 +29,11 @@
       },
       "locked": {
         "dir": "nix/dev-base",
-        "lastModified": 1779485075,
-        "narHash": "sha256-VKnvKRER9vQb000p5Rh/EP8Owq9tGQBEF9Yiqxswg6k=",
+        "lastModified": 1779486800,
+        "narHash": "sha256-wnpwzzVF7rv/l28qAXhnNl/1k5ddV1NLVy4yaZopX9g=",
         "owner": "fulsiram",
         "repo": "homelab",
-        "rev": "ccb1bdb280d4e15ad425361f248be375c52cc8e9",
+        "rev": "79321c1fb633141015985c4533a2f29d123136c9",
         "type": "github"
       },
       "original": {
@@ -41,27 +41,6 @@
         "owner": "fulsiram",
         "repo": "homelab",
         "type": "github"
-      }
-    },
-    "continuity-os": {
-      "inputs": {
-        "nixpkgs-caddy": "nixpkgs-caddy",
-        "nixpkgs-unstable": "nixpkgs-unstable"
-      },
-      "locked": {
-        "dir": "system/nixos",
-        "lastModified": 1779402461,
-        "narHash": "sha256-552uLvrjnpoVtEeYZHnwy2nFrd/7DrVcBD2GQiTJVKM=",
-        "ref": "refs/heads/main",
-        "rev": "c012952a3059d472ae8f2cdc494495a07a18986f",
-        "revCount": 142,
-        "type": "git",
-        "url": "https://codeberg.org/Akaia_Collective/continuity_os"
-      },
-      "original": {
-        "dir": "system/nixos",
-        "type": "git",
-        "url": "https://codeberg.org/Akaia_Collective/continuity_os"
       }
     },
     "disko": {
@@ -138,39 +117,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-caddy": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1777954456,
-        "narHash": "sha256-hGdgeU2Nk87RAuZyYjyDjFL6LK7dAZN5RE9+hrDTkDU=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
-        "type": "github"
-      }
-    },
-    "nixpkgs-unstable": {
-      "locked": {
-        "lastModified": 1779357205,
-        "narHash": "sha256-cCO8aTqss5x9Ky8GWkpY0Hy5fyTZEbtifSUV8QjSzic=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "f83fc3c307e74bc5fd5adb7eb6b8b13ffd2a36e1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1768564909,
@@ -207,7 +153,6 @@
       "inputs": {
         "akaia": "akaia",
         "base": "base",
-        "continuity-os": "continuity-os",
         "disko": "disko",
         "impermanence": "impermanence",
         "nixpkgs": "nixpkgs_3"

@@ -8,7 +8,7 @@
 
     impermanence.url = "github:nix-community/impermanence";
 
-    continuity-os.url = "git+https://codeberg.org/Akaia_Collective/continuity_os?dir=system/nixos";
+    # continuity-os.url = "git+https://codeberg.org/Akaia_Collective/continuity_os?dir=system/nixos";
 
     akaia = {
       url = "github:fulsiram/homelab?dir=nix/configs/akaia";
@@ -23,7 +23,7 @@
       disko,
       base,
       akaia,
-      continuity-os,
+      # continuity-os,
       impermanence,
       ...
     }:
@@ -36,7 +36,7 @@
           base.nixosModules.base
           base.nixosModules.bakeFlake
           impermanence.nixosModules.impermanence
-          continuity-os.nixosModules.default
+          # continuity-os.nixosModules.default
           "${akaia}/policy.nix"
           ./configuration.nix
           (
