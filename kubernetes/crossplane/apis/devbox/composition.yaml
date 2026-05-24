@@ -175,7 +175,7 @@ spec:
               selector:
                 platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
               ports:
-              {{ range .observed.composite.resource.sped.exposedPorts }}
+              {{ range .observed.composite.resource.spec.exposedPorts }}
                 - port: {{ . }}
                   targetPort: {{ . }}
               {{ end }}
