@@ -1,0 +1,7 @@
+apiVersion: platform.salami.network/v1
+kind: Devbox
+metadata:
+  namespace: vmstest
+  name: hiii
+spec:
+  owner: fulsiram

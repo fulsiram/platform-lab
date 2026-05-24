@@ -4,3 +4,5 @@ metadata:
   name: function-yggdrasil
 spec:
   package: harbor.salami.network/images/function-yggdrasil:latest
+  packagePullSecrets:
+    - name: harbor-creds

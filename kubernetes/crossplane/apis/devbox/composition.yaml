@@ -1,0 +1,182 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: devbox-templated-yaml
+spec:
+  compositeTypeRef:
+    apiVersion: platform.salami.network/v1
+    kind: Devbox
+  mode: Pipeline
+  pipeline:
+    - step: generate-yggdrasil-identity
+      functionRef:
+        name: function-yggdrasil
+      input:
+        apiVersion: yggdrasil.salami.network/v1beta1
+        kind: Input
+        name: ygg
+
+    - step: template
+      functionRef:
+        name: crossplane-contrib-function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            ---
+            apiVersion: cdi.kubevirt.io/v1beta1
+            kind: DataVolume
+            metadata:
+              name: {{ .observed.composite.resource.metadata.name }}-rootdisk
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: rootdisk-dv
+                gotemplating.fn.crossplane.io/ready: "True"
+              labels:
+                platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
+            spec:
+              source:
+                registry:
+                  url: docker://harbor.salami.network/kubevirt-rootdisks/nixos:latest
+                  secretRef: harbor-creds-cdi
+              storage:
+                accessModes: [ReadWriteOnce]
+                resources:
+                  requests:
+                    storage: 5Gi
+                storageClassName: local-path
+
+            ---
+            apiVersion: cdi.kubevirt.io/v1beta1
+            kind: DataVolume
+            metadata:
+              name: {{ .observed.composite.resource.metadata.name }}-nixstore
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: nixstore-dv
+                gotemplating.fn.crossplane.io/ready: "True"
+              labels:
+                platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
+            spec:
+              source:
+                registry:
+                  url: docker://harbor.salami.network/kubevirt-rootdisks/nixos-nix:latest
+                  secretRef: harbor-creds-cdi
+              storage:
+                accessModes: [ReadWriteOnce]
+                resources:
+                  requests:
+                    storage: 30Gi
+                storageClassName: local-path
+
+            ---
+            apiVersion: v1
+            kind: PersistentVolumeClaim
+            metadata:
+              name: {{ .observed.composite.resource.metadata.name }}-persistent
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: persistent-pvc
+                gotemplating.fn.crossplane.io/ready: "True"
+              labels:
+                platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
+            spec:
+              accessModes: [ReadWriteOnce]
+              resources:
+                requests:
+                  storage: 10Gi
+              storageClassName: local-path
+
+
+            ---
+            apiVersion: kubevirt.io/v1
+            kind: VirtualMachine
+            metadata:
+              name: {{ .observed.composite.resource.metadata.name }}
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: vm
+                gotemplating.fn.crossplane.io/ready: "True"
+              labels:
+                platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
+            spec:
+              runStrategy: Manual
+              template:
+                metadata:
+                  labels:
+                    platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
+                spec:
+                  domain:
+                    firmware:
+                      bootloader:
+                        efi:
+                          secureBoot: false
+                    resources:
+                      overcommitGuestOverhead: true
+                      requests:
+                        memory: 1G
+                    memory:
+                      guest: 4G
+                    devices:
+                      filesystems:
+                        - name: yggdrasil-secret
+                          virtiofs: {}
+                      disks:
+                        - name: rootdisk
+                          disk:
+                            bus: virtio
+                        - name: nixstore
+                          serial: NIXSTORE
+                          disk:
+                            bus: virtio
+                        - name: persistent
+                          serial: PERSISTENT
+                          disk:
+                            bus: virtio
+                        - name: cloudinitdisk
+                          disk:
+                            bus: virtio
+                      interfaces:
+                        - name: default
+                          masquerade: {}
+                  networks:
+                    - name: default
+                      pod: {}
+                  
+                  volumes:
+                    - name: rootdisk
+                      dataVolume:
+                        name: {{ .observed.composite.resource.metadata.name }}-rootdisk
+                    - name: nixstore
+                      dataVolume:
+                        name: {{ .observed.composite.resource.metadata.name }}-nixstore
+                    - name: persistent
+                      persistentVolumeClaim:
+                        claimName: {{ .observed.composite.resource.metadata.name }}-persistent
+                    - name: yggdrasil-secret
+                      secret:
+                        secretName: {{ .observed.composite.resource.metadata.name }}-ygg
+                    - name: cloudinitdisk
+                      cloudInitNoCloud:
+                        userDataBase64: SGkuXG4=
+
+            {{ $svcName := printf "%s-svc" .observed.composite.resource.metadata.name }}
+            ---
+            apiVersion: v1
+            kind: Service
+            metadata:
+              name: {{ $svcName }}
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: service
+              labels:
+                platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
+                io.cilium/lb-ipam-pool: akaia-peering
+            spec:
+              type: LoadBalancer
+              selector:
+                platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
+              ports:
+                - port: 22
+                  targetPort: 22
+
+    - step: automatically-detect-readiness
+      functionRef:
+        name: function-auto-ready
