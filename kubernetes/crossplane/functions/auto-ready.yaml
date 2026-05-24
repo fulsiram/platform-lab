@@ -1,6 +1,6 @@
 apiVersion: pkg.crossplane.io/v1
 kind: Function
 metadata:
-  name: function-yggdrasil
+  name: function-auto-ready
 spec:
-  package: harbor.salami.network/images/function-yggdrasil:latest
+  package: xpkg.crossplane.io/crossplane-contrib/function-auto-ready:v0.6.5
