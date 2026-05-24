@@ -174,8 +174,9 @@ spec:
               selector:
                 platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
               ports:
-                - port: 22
-                  targetPort: 22
+              {{ range .observed.composite.resource.sped.exposedPorts }}
+                - port: {{ . }}
+                  targetPort: {{ . }}
 
     - step: automatically-detect-readiness
       functionRef:
