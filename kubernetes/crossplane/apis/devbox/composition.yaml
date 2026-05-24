@@ -178,6 +178,7 @@ spec:
               {{ range .observed.composite.resource.sped.exposedPorts }}
                 - port: {{ . }}
                   targetPort: {{ . }}
+              {{ end }}
 
     - step: automatically-detect-readiness
       functionRef:
