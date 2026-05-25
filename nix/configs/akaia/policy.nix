@@ -11,7 +11,7 @@
 
   fileSystems."/secrets/ssh-keys" = {
     fsType = "virtiofs";
-    device = "ssh-keys";
+    device = "ssh-authorized-keys";
   };
 
   services.openssh.authorizedKeysFiles = [
