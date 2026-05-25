@@ -180,6 +180,13 @@ spec:
                   targetPort: {{ . }}
               {{ end }}
 
+            ---
+            apiVersion: platform.salami.network/v1
+            kind: Devbox
+            status:
+              address: {{ with get (getComposedResource . "service").status.loadBalancer "ingress" }}{{ get (first .) "ip" | default "" | quote }}{{ else }}""{{ end }}
+              yggdrasilAddress: {{ get (getComposedResource . "yggdrasil-config").data "address" }}
+              yggdrasilPubkey: {{ get (getComposedResource . "yggdrasil-config").data "publicKey" }}
     - step: automatically-detect-readiness
       functionRef:
         name: function-auto-ready

@@ -32,3 +32,14 @@ spec:
               properties:
                 address:
                   type: string
+                yggdrasilAddress:
+                  type: string
+                yggdrasilPubkey:
+                  type: string
+      additionalPrinterColumns:
+        - name: Address
+          type: string
+          jsonPath: .status.address
+        - name: Owner
+          type: string
+          jsonPath: .spec.owner
