@@ -119,7 +119,7 @@ spec:
                       filesystems:
                         - name: yggdrasil-secret
                           virtiofs: {}
-                        - name: ssh-keys
+                        - name: ssh-authorized-keys
                           virtiofs: {}
                       disks:
                         - name: rootdisk
