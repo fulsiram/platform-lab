@@ -119,6 +119,8 @@ spec:
                       filesystems:
                         - name: yggdrasil-secret
                           virtiofs: {}
+                        - name: ssh-keys
+                          virtiofs: {}
                       disks:
                         - name: rootdisk
                           disk:
@@ -154,6 +156,9 @@ spec:
                     - name: yggdrasil-secret
                       secret:
                         secretName: {{ .observed.composite.resource.metadata.name }}-ygg
+                    - name: ssh-authorized-keys
+                      configMap:
+                        name: {{ .observed.composite.resource.spec.owner }}-ssh-keys
                     - name: cloudinitdisk
                       cloudInitNoCloud:
                         userDataBase64: SGkuXG4=

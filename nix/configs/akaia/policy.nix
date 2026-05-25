@@ -9,6 +9,29 @@
     device = "yggdrasil-secret";
   };
 
+  fileSystems."/secrets/ssh-keys" = {
+    fsType = "virtiofs";
+    device = "ssh-keys";
+  };
+
+  services.openssh.authorizedKeysFiles = [
+    "/etc/ssh/authorized_keys.d/%u"
+    "%h/.ssh/authorized_keys"
+    "/var/lib/injected-keys/%u"
+  ];
+
+  systemd.services.initialize-ssh-keys = {
+    wantedBy = [ "multi-user.target" ];
+    before = [ "sshd.service" ];
+    after = [ "local-fs.target" ];
+    serviceConfig.Type = "oneshot";
+    path = with pkgs; [ util-linux ];
+    script = ''
+      install -d -m 755 /var/lib/injected-keys
+      install -m 644 /secrets/ssh-keys/authorized_keys /var/lib/injected-keys/user
+    '';
+  };
+
   services.yggdrasil = {
     persistentKeys = false;
     enable = true;
@@ -28,11 +51,6 @@
   users.users.user = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
-    openssh.authorizedKeys.keys = [
-      "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIDHnobcDBE+4+AOdYZj2tjQcplRfazs0YAdNePw2MLkfAAAAEXNzaDpwZXJzb25hbC1hdXRo fulsiram@personal-yk-1-auth"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGQ5mp97prL9Yvy1ZlfaEIyPaODbroGSBpzMqRANbpsv shadowfox@akaia.org"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAjv/S+sOP+W+PUQBLpJFfczqWFfgzeWczaw0wszMrbK shadowfox@san-ti-hub"
-    ];
   };
 
   environment.systemPackages = with pkgs; [
