@@ -21,9 +21,11 @@
   ];
 
   systemd.services.initialize-ssh-keys = {
-    wantedBy = [ "multi-user.target" ];
     before = [ "sshd.service" ];
-    after = [ "local-fs.target" ];
+    requires = [ "secrets-ssh-keys.mount" ];
+    after = [ "secrets-ssh-keys.mount" ];
+    wantedBy = [ "multi-user.target" ];
+
     serviceConfig.Type = "oneshot";
     path = with pkgs; [ util-linux ];
     script = ''
