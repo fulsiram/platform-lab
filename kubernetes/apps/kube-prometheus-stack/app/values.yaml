@@ -7,6 +7,7 @@ grafana:
       auto_assign_org_role: Admin
     auth.generic_oauth:
       enabled: true
+      use_pkce: true
       name: Keycloak OAuth
       allow_sign_up: true
       scopes: openid email profile roles
