@@ -1,0 +1,47 @@
+grafana:
+  enabled: true
+  grafana.ini:
+    server:
+      root_url: https://grafana.salami.network
+    users:
+      auto_assign_org_role: Admin
+    auth.generic_oauth:
+      enabled: true
+      name: Keycloak OAuth
+      allow_sign_up: true
+      scopes: openid email profile roles
+      email_attribute_path: email
+      login_attribute_path: username
+      auth_url: https://auth.salami.network/realms/members/protocol/openid-connect/auth
+      token_url: https://auth.salami.network/realms/members/protocol/openid-connect/token
+      api_url: https://auth.salami.network/realms/members/protocol/openid-connect/userinfo
+  route:
+    main:
+      enabled: true
+      hostnames:
+        - grafana.salami.network
+      parentRefs:
+        - name: gateway
+          namespace: gateway-infra
+          sectionName: https-wildcard
+  envValueFrom:
+    GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
+      secretKeyRef:
+        name: grafana-oauth
+        key: client-id
+    GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET:
+      secretKeyRef:
+        name: grafana-oauth
+        key: client-secret
+
+prometheus:
+  prometheusSpec:
+    retention: 30d
+    retentionSize: "50GB"
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: "60Gi"
