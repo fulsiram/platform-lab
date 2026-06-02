@@ -7,6 +7,11 @@ grafana:
         foldersFromFilesStructure: true
       annotations:
         grafana_folder: KPS
+  dashboards:
+    default:
+      kubevirt:
+        url: https://raw.githubusercontent.com/kubevirt/monitoring/refs/heads/main/dashboards/grafana/kubevirt-control-plane.json
+        datasource: Prometheus
 
   grafana.ini:
     server:
