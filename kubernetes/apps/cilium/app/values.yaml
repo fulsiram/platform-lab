@@ -57,10 +57,6 @@ hubble:
     enabled: true
   ui:
     enabled: true
-  dashboards:
-    enabled: true
-    annotations:
-      grafana_folder: Cilium
   metrics:
     enabled:
       - dns
@@ -70,5 +66,9 @@ hubble:
       - icmp
       - httpV2
       - policy
+    dashboards:
+      enabled: true
+      annotations:
+        grafana_folder: Cilium
     serviceMonitor:
       enabled: true
