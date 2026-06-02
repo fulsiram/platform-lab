@@ -24,6 +24,9 @@ grafana:
       kubevirt:
         url: https://raw.githubusercontent.com/kubevirt/monitoring/refs/heads/main/dashboards/grafana/kubevirt-control-plane.json
         datasource: Prometheus
+      argocd:
+        url: https://raw.githubusercontent.com/argoproj/argo-cd/refs/heads/master/examples/dashboard.json
+        datasource: Prometheus
 
   grafana.ini:
     server:
