@@ -41,6 +41,12 @@ grafana:
 
 prometheus:
   prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+    scrapeConfigSelectorNilUsesHelmValues: false
+
     retention: 30d
     retentionSize: "50GB"
     storageSpec:
