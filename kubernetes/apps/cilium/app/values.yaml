@@ -11,9 +11,6 @@ ipv4:
 ipv6:
   enabled: true
 
-operator:
-  replicas: 1
-
 socketLB:
   hostNamespaceOnly: true
 
@@ -28,8 +25,50 @@ ipam:
       - fd4f:d0b5:c2ab:0000::/56
     clusterPoolIPv6MaskSize: 64
 
+dashboards:
+  enabled: true
+  annotations:
+    grafana_folder: Cilium
+
+prometheus:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+operator:
+  replicas: 1
+  dashboards:
+    enabled: true
+    annotations:
+      grafana_folder: Cilium
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+envoy:
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
 hubble:
   relay:
     enabled: true
   ui:
     enabled: true
+  dashboards:
+    enabled: true
+    annotations:
+      grafana_folder: Cilium
+  metrics:
+    enabled:
+      - dns
+      - drop
+      - flow
+      - tcp
+      - icmp
+      - httpV2
+      - policy
+    serviceMonitor:
+      enabled: true
