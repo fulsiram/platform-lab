@@ -1,5 +1,13 @@
 grafana:
   enabled: true
+  sidecar:
+    dashboards:
+      folderAnnotation: grafana_folder
+      provider:
+        foldersFromFilesStructure: true
+      annotations:
+      grafana_folder: KPS
+
   grafana.ini:
     server:
       root_url: https://grafana.salami.network
