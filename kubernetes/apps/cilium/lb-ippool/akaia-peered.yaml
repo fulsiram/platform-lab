@@ -1,0 +1,12 @@
+apiVersion: cilium.io/v2
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: akaia-peering
+  namespace: akaia-peering
+spec:
+  serviceSelector:
+    matchLabels:
+      io.cilium/lb-ipam-pool: akaia-peering
+  allowFirstLastIPs: "No"
+  blocks:
+    - cidr: 192.168.110.1/24
