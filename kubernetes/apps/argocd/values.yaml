@@ -14,6 +14,11 @@ configs:
     server.insecure: true
 
 server:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
   httproute:
     enabled: true
     hostnames:
@@ -29,3 +34,33 @@ server:
       - name: gateway
         namespace: gateway-infra
         sectionName: https-wildcard
+
+controller:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+dex:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+repoServer:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+applicationSet:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+notifications:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
