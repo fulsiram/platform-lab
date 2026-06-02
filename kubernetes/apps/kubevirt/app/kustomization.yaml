@@ -4,3 +4,18 @@ kind: Kustomization
 resources:
   - https://github.com/kubevirt/kubevirt/releases/download/v1.8.2/kubevirt-operator.yaml
   - https://github.com/kubevirt/kubevirt/releases/download/v1.8.2/kubevirt-cr.yaml
+
+patches:
+  - target:
+      group: kubevirt.io
+      version: v1
+      kind: KubeVirt
+      name: kubevirt
+      namespace: kubevirt
+    patch: |-
+      - op: add
+        path: /spec/monitorNamespace
+        value: monitoring
+      - op: add
+        path: /spec/monitorAccount
+        value: kube-prometheus-stack-prometheus
