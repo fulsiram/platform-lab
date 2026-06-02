@@ -6,7 +6,7 @@ grafana:
       provider:
         foldersFromFilesStructure: true
       annotations:
-      grafana_folder: KPS
+        grafana_folder: KPS
 
   grafana.ini:
     server:
