@@ -1,0 +1,4 @@
+server:
+  retentionPeriod: "30d"
+  persistentVolume:
+    size: 20Gi
