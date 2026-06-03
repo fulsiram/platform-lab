@@ -1,5 +1,12 @@
 grafana:
   enabled: true
+  plugins:
+    - victoriametrics-logs-datasource
+  additionalDataSources:
+    - name: VictoriaLogs
+      type: victoriametrics-logs-datasource
+      access: proxy
+      url: http://victoria-logs-victoria-logs-single-server:9428
   sidecar:
     dashboards:
       folderAnnotation: grafana_folder
