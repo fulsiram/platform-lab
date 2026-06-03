@@ -2,3 +2,10 @@ server:
   retentionPeriod: "30d"
   persistentVolume:
     size: 20Gi
+  serviceMonitor:
+    enabled: true
+
+dashboards:
+  enabled: true
+  labels:
+    grafana_dashboard: "1"
