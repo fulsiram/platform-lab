@@ -3,6 +3,8 @@ kind: Gateway
 metadata:
   name: gateway
   namespace: gateway-infra
+  annotations:
+    external-dns.alpha.kubernetes.io/target: "pepperoni.salami.network"
 spec:
   gatewayClassName: traefik
   listeners:
