@@ -1,0 +1,27 @@
+provider:
+  name: webhook
+  webhook:
+    image:
+      repository: harbor.salami.network/images/external-dns-desec-webhook
+      tag: v0.1.0
+      pullPolicy: IfNotPresent
+    env:
+      - name: DESEC_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: external-dns-desec-token
+            key: token
+      - name: DESEC_DOMAINS
+        value: salami.network
+
+domainFilters:
+  - salami.network
+
+imagePullSecrets:
+  - name: harbor-creds
+
+sources:
+  - gateway-httproute
+
+policy: upsert-only
+txtOwnerId: pepperoni-external-dns

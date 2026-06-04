@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-dns
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://kubernetes-sigs.github.io/external-dns/
+      path: external-dns
+      targetRevision: 1.21.1
+      helm:
+        releaseName: external-dns
+        valueFiles:
+          - $values/kubernetes/apps/external-dns/app/values.yaml
+    - repoURL: https://github.com/fulsiram/homelab.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://github.com/fulsiram/homelab.git
+      targetRevision: main
+      path: kubernetes/apps/external-dns/secrets
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: external-dns
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
