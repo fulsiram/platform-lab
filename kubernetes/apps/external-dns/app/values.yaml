@@ -23,5 +23,5 @@ imagePullSecrets:
 sources:
   - gateway-httproute
 
-policy: upsert-only
+policy: sync
 txtOwnerId: pepperoni-external-dns
