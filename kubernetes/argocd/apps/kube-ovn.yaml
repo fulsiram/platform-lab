@@ -8,11 +8,11 @@ spec:
   sources:
     - repoURL: oci://ghcr.io/kubeovn/charts/kube-ovn-v2
       path: .
-      targetRevision: v1.17.0
+      targetRevision: v1.16.2
       helm:
         releaseName: kube-ovn
         valueFiles:
-          - $values/kubernetes/apps/kube-ovn/values.yaml
+          - $values/kubernetes/apps/kube-ovn/config/values.yaml
     - repoURL: https://github.com/fulsiram/homelab.git
       targetRevision: main
       ref: values
