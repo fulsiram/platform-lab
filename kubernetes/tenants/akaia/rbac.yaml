@@ -12,6 +12,10 @@ rules:
       - configmaps
       - events
     verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources:
+      - configmaps
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   - apiGroups: ["platform.salami.network"]
     resources:
       - devboxes

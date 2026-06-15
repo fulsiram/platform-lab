@@ -1,0 +1,106 @@
+---
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: oidc-configmap-allowlist
+  namespace: team-akaia
+spec:
+  validationActions:
+    - Deny
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE", "DELETE"]
+        resources: ["configmaps"]
+  matchConditions:
+    - name: only-oidc-users
+      expression: request.userInfo.username.startsWith("oidc:")
+  validations:
+    - message: "OIDC users may only manage ConfigMaps named '*-ssh-keys'."
+      expression: >
+        object.metadata.name.endsWith("-ssh-keys")
+
+---
+apiVersion: policies.kyverno.io/v1
+# kind: NamespacedMutatingPolicy
+kind: MutatingPolicy
+metadata:
+  name: set-ssh-keys-owner
+  namespace: team-akaia
+spec:
+  matchConstraints:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: team-akaia
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["configmaps"]
+  matchConditions:
+    - name: only-oidc-users
+      expression: request.userInfo.username.startsWith("oidc:")
+    - name: only-ssh-keys
+      expression: object.metadata.name.endsWith("-ssh-keys")
+  mutations:
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        expression: >
+          Object{
+            metadata: Object.metadata{
+              annotations: {
+                "platform.salami.network/owner": request.userInfo.username
+              }
+            }
+          }
+
+---
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: only-ssh-keys-owner-can-modify
+  namespace: team-akaia
+spec:
+  validationActions:
+    - Deny
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["UPDATE", "DELETE"]
+        resources: ["configmaps"]
+  matchConditions:
+    - name: only-oidc-users
+      expression: request.userInfo.username.startsWith("oidc:")
+    - name: only-ssh-keys
+      expression: object.metadata.name.endsWith("-ssh-keys")
+  validations:
+    - message: "Only owner may update or delete this ssh keys."
+      expression: >
+        oldObject.metadata.?annotations["platform.salami.network/owner"].orValue("") == request.userInfo.username
+
+---
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: ssh-keys-owner-is-immutable
+  namespace: team-akaia
+spec:
+  validationActions:
+    - Deny
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["UPDATE"]
+        resources: ["configmaps"]
+  matchConditions:
+    - name: only-oidc-users
+      expression: request.userInfo.username.startsWith("oidc:")
+    - name: only-ssh-keys
+      expression: object.metadata.name.endsWith("-ssh-keys")
+  validations:
+    - message: "Owner is immutable"
+      expression: >
+        oldObject.metadata.?annotations["platform.salami.network/owner"].orValue("") == object.metadata.?annotations["platform.salami.network/owner"].orValue("")
