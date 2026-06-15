@@ -29,7 +29,7 @@
       luks.devices.p1.device = lib.mkForce "/dev/disk/by-partlabel/crypt_p1";
       luks.devices.p2.device = lib.mkForce "/dev/disk/by-partlabel/crypt_p2";
 
-      luks.reusePassphrases = true;
+      # luks.reusePassphrases = true;
 
       availableKernelModules = [
         "igb"
@@ -52,7 +52,7 @@
           authorizedKeys = [
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN6+2C1xsDgmYV/9JahsUeSU++WvegOznRgO9/Qd+Msg fulsiram@mbp"
           ];
-          shell = "/bin/cryptsetup-askpass";
+          # shell = "/bin/cryptsetup-askpass";
         };
       };
     };

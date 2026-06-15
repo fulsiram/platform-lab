@@ -81,6 +81,8 @@
                         "compress=zstd"
                         "noatime"
                         "ssd"
+                        "x-systemd.device-timeout=infinity"
+                        "x-systemd.requires=dev-mapper-p1.device"
                       ];
                     };
                     "/home" = {
