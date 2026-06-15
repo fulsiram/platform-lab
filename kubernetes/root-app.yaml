@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/fulsiram/homelab.git
+    repoURL: https://github.com/fulsiram/platform-lab.git
     targetRevision: HEAD
     path: kubernetes/argocd/apps
   destination:

@@ -13,7 +13,7 @@
 #         releaseName: kube-ovn
 #         valueFiles:
 #           - $values/kubernetes/apps/kube-ovn/config/values.yaml
-#     - repoURL: https://github.com/fulsiram/homelab.git
+#     - repoURL: https://github.com/fulsiram/platform-lab.git
 #       targetRevision: main
 #       ref: values
 #   destination:

@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: https://github.com/fulsiram/homelab.git
+    - repoURL: https://github.com/fulsiram/platform-lab.git
       path: kubernetes/apps/tekton/app/
       targetRevision: main
   destination:
@@ -34,7 +34,7 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: https://github.com/fulsiram/homelab.git
+    - repoURL: https://github.com/fulsiram/platform-lab.git
       path: kubernetes/apps/tekton/config/
       targetRevision: main
   destination:
@@ -56,7 +56,7 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: https://github.com/fulsiram/homelab.git
+    - repoURL: https://github.com/fulsiram/platform-lab.git
       path: kubernetes/pipelines/nixos-dev-images/
       targetRevision: main
   destination:

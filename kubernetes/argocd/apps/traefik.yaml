@@ -13,7 +13,7 @@ spec:
         releaseName: traefik
         valueFiles:
           - $values/kubernetes/apps/traefik/values.yaml
-    - repoURL: https://github.com/fulsiram/homelab.git
+    - repoURL: https://github.com/fulsiram/platform-lab.git
       targetRevision: main
       ref: values
   destination:

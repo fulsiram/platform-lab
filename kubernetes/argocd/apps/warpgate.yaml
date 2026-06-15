@@ -13,10 +13,10 @@ spec:
         releaseName: warpgate
         valueFiles:
           - $values/kubernetes/apps/warpgate/app/values.yaml
-    - repoURL: https://github.com/fulsiram/homelab.git
+    - repoURL: https://github.com/fulsiram/platform-lab.git
       targetRevision: main
       ref: values
-    - repoURL: https://github.com/fulsiram/homelab.git
+    - repoURL: https://github.com/fulsiram/platform-lab.git
       targetRevision: main
       path: kubernetes/apps/warpgate/manifests
   destination:
@@ -37,7 +37,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/fulsiram/homelab.git
+    repoURL: https://github.com/fulsiram/platform-lab.git
     path: kubernetes/apps/warpgate/db/
     targetRevision: main
   destination:

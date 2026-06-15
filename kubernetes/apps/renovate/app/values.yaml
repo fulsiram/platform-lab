@@ -9,6 +9,6 @@ renovate:
         "autodiscover": false,
         "gitAuthor": "Renovate Bot <renovate@salami.network>",
         "repositories": [
-          "fulsiram/homelab"
+          "fulsiram/platform-lab"
         ]
       }

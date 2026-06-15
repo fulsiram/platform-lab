@@ -21,4 +21,4 @@ spec:
               storage: 20Gi
   params:
     - name: repo-url
-      value: https://github.com/fulsiram/homelab.git
+      value: https://github.com/fulsiram/platform-lab.git
