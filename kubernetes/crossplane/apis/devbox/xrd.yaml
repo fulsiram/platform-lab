@@ -44,7 +44,7 @@ spec:
       additionalPrinterColumns:
         - name: Owner
           type: string
-          jsonPath: .metadata.annotations['platform.salami.network/owner']
+          jsonPath: .metadata.annotations['platform\.salami\.network/owner']
         - name: Address
           type: string
           jsonPath: .status.address
