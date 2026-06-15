@@ -59,13 +59,13 @@ hubble:
     enabled: true
   metrics:
     enabled:
-      - dns
-      - drop
-      - flow
-      - tcp
-      - icmp
-      - httpV2
-      - policy
+      - dns:query;labelsContext=source_namespace,destination_namespace
+      - drop:sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity
+      - flow:sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity
+      - tcp:sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity
+      - icmp:sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity
+      - httpV2:sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity
+      - policy:sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity
     dashboards:
       enabled: true
       annotations:
