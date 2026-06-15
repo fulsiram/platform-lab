@@ -1,0 +1,76 @@
+apiVersion: policies.kyverno.io/v1
+# kind: NamespacedMutatingPolicy
+kind: MutatingPolicy
+metadata:
+  name: set-devbox-owner
+  namespace: team-akaia
+spec:
+  matchConstraints:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: team-akaia
+    resourceRules:
+      - apiGroups: ["platform.salami.network"]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["devboxes"]
+  matchConditions:
+    - name: only-oidc-users
+      expression: request.userInfo.username.startsWith("oidc:")
+  mutations:
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        expression: >
+          Object{
+            metadata: Object.metadata{
+              annotations: {
+                "platform.salami.network/owner": request.userInfo.username
+              }
+            }
+          }
+
+---
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: only-xr-owner-can-modify
+  namespace: team-akaia
+spec:
+  validationActions:
+    - Deny
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["platform.salami.network"]
+        apiVersions: ["v1"]
+        operations: ["UPDATE", "DELETE"]
+        resources: ["devboxes"]
+  matchConditions:
+    - name: only-oidc-users
+      expression: request.userInfo.username.startsWith("oidc:")
+  validations:
+    - message: "Only owner may update or delete this devbox."
+      expression: >
+        oldObject.metadata.?annotations["platform.salami.network/owner"].orValue("") == request.userInfo.username
+
+---
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: xr-owner-is-immutable
+  namespace: team-akaia
+spec:
+  validationActions:
+    - Deny
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["platform.salami.network"]
+        apiVersions: ["v1"]
+        operations: ["UPDATE"]
+        resources: ["devboxes"]
+  matchConditions:
+    - name: only-oidc-users
+      expression: request.userInfo.username.startsWith("oidc:")
+  validations:
+    - message: "Owner is immutable"
+      expression: >
+        oldObject.metadata.?annotations["platform.salami.network/owner"].orValue("") == object.metadata.?annotations["platform.salami.network/owner"].orValue("")
