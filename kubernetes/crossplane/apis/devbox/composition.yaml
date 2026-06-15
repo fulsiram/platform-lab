@@ -158,7 +158,7 @@ spec:
                         secretName: {{ .observed.composite.resource.metadata.name }}-ygg
                     - name: ssh-authorized-keys
                       configMap:
-                        name: {{ .observed.composite.resource.spec.owner }}-ssh-keys
+                        name: {{ .observed.composite.resource.spec.authorizedKeysConfigMapRef.name }}
                     - name: cloudinitdisk
                       cloudInitNoCloud:
                         userDataBase64: SGkuXG4=

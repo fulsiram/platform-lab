@@ -23,10 +23,15 @@ spec:
                   type: array
                   items:
                     type: integer
-                owner:
-                  type: string
+                authorizedKeysConfigMapRef:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                  required:
+                    - name
               required:
-                - owner
+                - authorizedKeysConfigMapRef
             status:
               type: object
               properties:
@@ -37,9 +42,9 @@ spec:
                 yggdrasilPubkey:
                   type: string
       additionalPrinterColumns:
+        - name: Owner
+          type: string
+          jsonPath: .metadata.annotations['platform.salami.network/owner']
         - name: Address
           type: string
           jsonPath: .status.address
-        - name: Owner
-          type: string
-          jsonPath: .spec.owner
