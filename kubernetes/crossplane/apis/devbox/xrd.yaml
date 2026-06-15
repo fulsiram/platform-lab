@@ -19,6 +19,14 @@ spec:
             spec:
               type: object
               properties:
+                powerState:
+                  type: string
+                  default: Running
+                  schema:
+                    type: string
+                    enum:
+                      - Running
+                      - Stopped
                 exposedPorts:
                   type: array
                   items:

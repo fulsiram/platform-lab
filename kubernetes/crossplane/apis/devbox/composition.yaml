@@ -98,7 +98,7 @@ spec:
               labels:
                 platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
             spec:
-              runStrategy: Manual
+              runStrategy: {{ if eq (.observed.composite.resource.spec.powerState) "Running" }}Always{{ else }}Halted{{ end }}
               template:
                 metadata:
                   labels:
