@@ -30,5 +30,5 @@ spec:
     - group: apiextensions.k8s.io
       kind: CustomResourceDefinition
       jqPathExpressions:
-        - '.metadata.annotations | select(. == {})'
-        - '.metadata.labels | select(. == {})'
+        - ".metadata.annotations | select(. == {})"
+        - ".metadata.labels | select(. == {})"
