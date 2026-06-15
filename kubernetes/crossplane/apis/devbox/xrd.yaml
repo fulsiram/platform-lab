@@ -49,6 +49,8 @@ spec:
                   type: string
                 yggdrasilPubkey:
                   type: string
+                vmPrintableStatus:
+                  type: string
       additionalPrinterColumns:
         - name: Owner
           type: string
@@ -56,3 +58,6 @@ spec:
         - name: Address
           type: string
           jsonPath: .status.address
+        - name: VMStatus
+          type: string
+          jsonPath: .status.vmPrintableStatus
