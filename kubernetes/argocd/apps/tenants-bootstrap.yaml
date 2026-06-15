@@ -10,7 +10,7 @@ spec:
   generators:
     - git:
         repoURL: https://github.com/fulsiram/homelab.git
-        targetRevision: main
+        revision: main
         directories:
           - path: kubernetes/tenants/*
   template:
