@@ -356,7 +356,19 @@ func NewDevboxCmd(global *globalOptions) *cobra.Command {
 	}
 	restartCmd.Flags().DurationVar(&restartOpts.Timeout, "timeout", restartOpts.Timeout, "Maximum time to wait for each restart phase")
 
-	cmd.AddCommand(listCmd, getCmd, createCmd, deleteCmd, startCmd, stopCmd, restartCmd)
+	cmd.AddCommand(
+		listCmd,
+		getCmd,
+		createCmd,
+		deleteCmd,
+		startCmd,
+		stopCmd,
+		restartCmd,
+		NewDevboxSSHCmd(global),
+		NewDevboxSSHConfigCmd(global),
+		NewDevboxForwardCmd(global),
+		NewDevboxSSHProxyCmd(global),
+	)
 	return cmd
 }
 
