@@ -68,11 +68,11 @@ func NewDevboxCmd(global *globalOptions) *cobra.Command {
 				return err
 			}
 			manager := auth.NewManager(cfg, cmd.ErrOrStderr())
-			token, claims, err := manager.Token(cmd.Context())
+			_, claims, err := manager.Token(cmd.Context())
 			if err != nil {
 				return err
 			}
-			client, err := kube.DynamicClient(cfg, token.IDToken)
+			client, err := kube.DynamicClientWithTokenProvider(cfg, auth.NewIDTokenProvider(manager).IDToken)
 			if err != nil {
 				return err
 			}
@@ -100,11 +100,7 @@ func NewDevboxCmd(global *globalOptions) *cobra.Command {
 				return err
 			}
 			manager := auth.NewManager(cfg, cmd.ErrOrStderr())
-			token, _, err := manager.Token(cmd.Context())
-			if err != nil {
-				return err
-			}
-			client, err := kube.DynamicClient(cfg, token.IDToken)
+			client, err := kube.DynamicClientWithTokenProvider(cfg, auth.NewIDTokenProvider(manager).IDToken)
 			if err != nil {
 				return err
 			}
@@ -135,7 +131,7 @@ func NewDevboxCmd(global *globalOptions) *cobra.Command {
 				return err
 			}
 			manager := auth.NewManager(cfg, cmd.ErrOrStderr())
-			token, claims, err := manager.Token(cmd.Context())
+			_, claims, err := manager.Token(cmd.Context())
 			if err != nil {
 				return err
 			}
@@ -143,14 +139,15 @@ func NewDevboxCmd(global *globalOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			kubeClient, err := kube.KubernetesClient(cfg, token.IDToken)
+			tokenProvider := auth.NewIDTokenProvider(manager).IDToken
+			kubeClient, err := kube.KubernetesClientWithTokenProvider(cfg, tokenProvider)
 			if err != nil {
 				return err
 			}
 			if err := ensureDevboxSSHKeys(cmd.Context(), kubeClient, cfg.Namespace, keysName); err != nil {
 				return err
 			}
-			dynamicClient, err := kube.DynamicClient(cfg, token.IDToken)
+			dynamicClient, err := kube.DynamicClientWithTokenProvider(cfg, tokenProvider)
 			if err != nil {
 				return err
 			}
@@ -202,11 +199,7 @@ func NewDevboxCmd(global *globalOptions) *cobra.Command {
 				return err
 			}
 			manager := auth.NewManager(cfg, cmd.ErrOrStderr())
-			token, _, err := manager.Token(cmd.Context())
-			if err != nil {
-				return err
-			}
-			client, err := kube.DynamicClient(cfg, token.IDToken)
+			client, err := kube.DynamicClientWithTokenProvider(cfg, auth.NewIDTokenProvider(manager).IDToken)
 			if err != nil {
 				return err
 			}
@@ -540,11 +533,7 @@ func devboxDynamicClient(cmd *cobra.Command, global *globalOptions) (appconfig.C
 		return appconfig.Config{}, nil, err
 	}
 	manager := auth.NewManager(cfg, cmd.ErrOrStderr())
-	token, _, err := manager.Token(cmd.Context())
-	if err != nil {
-		return appconfig.Config{}, nil, err
-	}
-	client, err := kube.DynamicClient(cfg, token.IDToken)
+	client, err := kube.DynamicClientWithTokenProvider(cfg, auth.NewIDTokenProvider(manager).IDToken)
 	if err != nil {
 		return appconfig.Config{}, nil, err
 	}

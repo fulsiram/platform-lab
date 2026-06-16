@@ -166,7 +166,7 @@ func sshKeyTarget(cmd *cobra.Command, global *globalOptions) (sshKeyTargetInfo, 
 		return sshKeyTargetInfo{}, err
 	}
 	manager := auth.NewManager(cfg, cmd.ErrOrStderr())
-	token, claims, err := manager.Token(cmd.Context())
+	_, claims, err := manager.Token(cmd.Context())
 	if err != nil {
 		return sshKeyTargetInfo{}, err
 	}
@@ -174,7 +174,7 @@ func sshKeyTarget(cmd *cobra.Command, global *globalOptions) (sshKeyTargetInfo, 
 	if err != nil {
 		return sshKeyTargetInfo{}, err
 	}
-	client, err := kube.KubernetesClient(cfg, token.IDToken)
+	client, err := kube.KubernetesClientWithTokenProvider(cfg, auth.NewIDTokenProvider(manager).IDToken)
 	if err != nil {
 		return sshKeyTargetInfo{}, err
 	}

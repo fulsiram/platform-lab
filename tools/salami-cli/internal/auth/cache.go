@@ -98,3 +98,7 @@ func (t TokenSet) OAuth2TokenForRefresh() *oauth2.Token {
 		Expiry:       time.Now().Add(-time.Hour),
 	}
 }
+
+func (t TokenSet) Fresh(now time.Time) bool {
+	return tokenFresh(t.Expiry, now)
+}

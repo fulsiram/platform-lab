@@ -23,6 +23,7 @@ type Manager struct {
 	Config      appconfig.Config
 	Cache       Cache
 	OpenBrowser func(string) error
+	LoginFunc   func(context.Context, LoginOptions) (TokenSet, Claims, error)
 	Stderr      io.Writer
 	Now         func() time.Time
 }
@@ -153,18 +154,26 @@ func (m Manager) Token(ctx context.Context) (TokenSet, Claims, error) {
 	}
 	if token.RefreshToken == "" {
 		if err != nil {
-			return TokenSet{}, Claims{}, err
+			return m.loginAfterTokenFailure(ctx, fmt.Errorf("cached ID token is invalid: %w", err))
 		}
-		return TokenSet{}, Claims{}, errors.New("cached ID token is expired and no refresh token is available; run `salami auth login`")
+		return m.loginAfterTokenFailure(ctx, errors.New("cached ID token is expired and no refresh token is available"))
 	}
 
+	tokenSet, claims, err := m.refresh(ctx, token)
+	if err == nil {
+		return tokenSet, claims, nil
+	}
+	return m.loginAfterTokenFailure(ctx, fmt.Errorf("refresh OIDC token: %w", err))
+}
+
+func (m Manager) refresh(ctx context.Context, token TokenSet) (TokenSet, Claims, error) {
 	provider, oauthConfig, err := oauthConfig(ctx, m.Config, "http://127.0.0.1/callback")
 	if err != nil {
 		return TokenSet{}, Claims{}, err
 	}
 	refreshed, err := oauthConfig.TokenSource(ctx, token.OAuth2TokenForRefresh()).Token()
 	if err != nil {
-		return TokenSet{}, Claims{}, fmt.Errorf("refresh OIDC token: %w", err)
+		return TokenSet{}, Claims{}, err
 	}
 	if refreshed.RefreshToken == "" {
 		refreshed.RefreshToken = token.RefreshToken
@@ -177,6 +186,11 @@ func (m Manager) Token(ctx context.Context) (TokenSet, Claims, error) {
 		return TokenSet{}, Claims{}, err
 	}
 	return tokenSet, claims, nil
+}
+
+func (m Manager) loginAfterTokenFailure(ctx context.Context, reason error) (TokenSet, Claims, error) {
+	fmt.Fprintf(m.stderr(), "%v; starting OIDC login\n", reason)
+	return m.login(ctx, LoginOptions{})
 }
 
 func (m Manager) Status() (Status, error) {
@@ -312,6 +326,13 @@ func (m Manager) openBrowser(url string) error {
 		return m.OpenBrowser(url)
 	}
 	return nil
+}
+
+func (m Manager) login(ctx context.Context, opts LoginOptions) (TokenSet, Claims, error) {
+	if m.LoginFunc != nil {
+		return m.LoginFunc(ctx, opts)
+	}
+	return m.Login(ctx, opts)
 }
 
 func (m Manager) now() time.Time {

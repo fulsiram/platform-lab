@@ -203,11 +203,11 @@ func devboxSSHClients(cmd *cobra.Command, global *globalOptions) (devboxSSHClien
 		return devboxSSHClient{}, err
 	}
 	manager := auth.NewManager(cfg, cmd.ErrOrStderr())
-	token, claims, err := manager.Token(cmd.Context())
+	_, claims, err := manager.Token(cmd.Context())
 	if err != nil {
 		return devboxSSHClient{}, err
 	}
-	restConfig, err := kube.RESTConfig(cfg, token.IDToken)
+	restConfig, err := kube.RESTConfigWithTokenProvider(cfg, auth.NewIDTokenProvider(manager).IDToken)
 	if err != nil {
 		return devboxSSHClient{}, err
 	}
