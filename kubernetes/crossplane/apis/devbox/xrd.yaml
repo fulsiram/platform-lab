@@ -22,15 +22,30 @@ spec:
                 powerState:
                   type: string
                   default: Running
-                  schema:
-                    type: string
-                    enum:
-                      - Running
-                      - Stopped
+                  enum:
+                    - Running
+                    - Stopped
                 exposedPorts:
                   type: array
                   items:
                     type: integer
+                diskGenerations:
+                  type: object
+                  default:
+                    root: 1
+                    nixStore: 1
+                  properties:
+                    root:
+                      type: integer
+                      default: 1
+                      minimum: 1
+                    nixStore:
+                      type: integer
+                      default: 1
+                      minimum: 1
+                  required:
+                    - root
+                    - nixStore
                 authorizedKeysConfigMapRef:
                   type: object
                   properties:
@@ -39,6 +54,7 @@ spec:
                   required:
                     - name
               required:
+                - diskGenerations
                 - authorizedKeysConfigMapRef
             status:
               type: object
