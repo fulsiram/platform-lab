@@ -10,6 +10,7 @@ import (
 
 	"github.com/fulsiram/platform-lab/tools/salami-cli/internal/devbox"
 	"github.com/fulsiram/platform-lab/tools/salami-cli/internal/sshkeys"
+	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
@@ -52,10 +53,96 @@ func TestDevboxCommandIncludesGetAndDelete(t *testing.T) {
 		t.Fatalf("Execute: %v", err)
 	}
 	help := out.String()
-	for _, want := range []string{"get", "delete", "start", "stop", "restart"} {
+	for _, want := range []string{"get", "delete", "start", "stop", "restart", "reset"} {
 		if !strings.Contains(help, want) {
 			t.Fatalf("help %q does not contain %q", help, want)
 		}
+	}
+}
+
+func TestDevboxResetCommandIsRegistered(t *testing.T) {
+	cmd, err := NewRootCmd()
+	if err != nil {
+		t.Fatalf("NewRootCmd: %v", err)
+	}
+	cmd.SetArgs([]string{"devbox", "reset", "--help"})
+	var out bytes.Buffer
+	cmd.SetOut(&out)
+	cmd.SetErr(&out)
+
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("Execute: %v", err)
+	}
+	help := out.String()
+	for _, want := range []string{"Reset Devbox disks to baseline", "--root", "--nixstore", "--yes", "--timeout"} {
+		if !strings.Contains(help, want) {
+			t.Fatalf("help %q does not contain %q", help, want)
+		}
+	}
+	if strings.Contains(help, "--all") {
+		t.Fatalf("help unexpectedly contains --all: %q", help)
+	}
+}
+
+func TestDevboxResetRequiresDiskTarget(t *testing.T) {
+	cmd, err := NewRootCmd()
+	if err != nil {
+		t.Fatalf("NewRootCmd: %v", err)
+	}
+	cmd.SetArgs([]string{"devbox", "reset", "dev-a"})
+	var out bytes.Buffer
+	cmd.SetOut(&out)
+	cmd.SetErr(&out)
+
+	err = cmd.Execute()
+	if err == nil {
+		t.Fatal("expected reset target error")
+	}
+	if !strings.Contains(err.Error(), "--root and/or --nixstore") {
+		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestDevboxResetWithoutNamePrintsHelp(t *testing.T) {
+	cmd, err := NewRootCmd()
+	if err != nil {
+		t.Fatalf("NewRootCmd: %v", err)
+	}
+	cmd.SetArgs([]string{"devbox", "reset"})
+	var out bytes.Buffer
+	cmd.SetOut(&out)
+	cmd.SetErr(&out)
+
+	err = cmd.Execute()
+	if err == nil {
+		t.Fatal("expected missing name error")
+	}
+	if !strings.Contains(err.Error(), "accepts 1 arg") {
+		t.Fatalf("error = %v", err)
+	}
+	for _, want := range []string{"Reset Devbox disks to baseline", "Usage:", "--root", "--nixstore"} {
+		if !strings.Contains(out.String(), want) {
+			t.Fatalf("output %q does not contain %q", out.String(), want)
+		}
+	}
+}
+
+func TestConfirmDevboxResetRequiresYesWhenNonInteractive(t *testing.T) {
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetIn(strings.NewReader(""))
+	var errOut bytes.Buffer
+	cmd.SetErr(&errOut)
+
+	err := confirmDevboxReset(cmd, "team-a", "dev-a", devboxResetOptions{Root: true})
+	if err == nil {
+		t.Fatal("expected confirmation error")
+	}
+	if !strings.Contains(err.Error(), "--yes") {
+		t.Fatalf("error = %v", err)
+	}
+
+	if err := confirmDevboxReset(cmd, "team-a", "dev-a", devboxResetOptions{Root: true, Yes: true}); err != nil {
+		t.Fatalf("confirm with yes: %v", err)
 	}
 }
 
@@ -176,6 +263,29 @@ func TestFormatDevboxStoppedAndRestarted(t *testing.T) {
 	}
 	if got, want := formatDevboxRestarted(db, 74*time.Second), "=> Devbox team-a/dev-a restarted in 1m14s"; got != want {
 		t.Fatalf("formatDevboxRestarted = %q, want %q", got, want)
+	}
+}
+
+func TestFormatDevboxReset(t *testing.T) {
+	db := devbox.Devbox{
+		Namespace: "team-a",
+		Name:      "dev-a",
+	}
+	opts := devboxResetOptions{Root: true, NixStore: true}
+	if got, want := formatDevboxResetTargets(opts), "rootfs and nixstore"; got != want {
+		t.Fatalf("formatDevboxResetTargets = %q, want %q", got, want)
+	}
+	if got, want := formatDevboxReset(db, formatDevboxResetTargets(opts), 74*time.Second), "=> Devbox team-a/dev-a reset rootfs and nixstore in 1m14s"; got != want {
+		t.Fatalf("formatDevboxReset = %q, want %q", got, want)
+	}
+	if got, want := formatDevboxResetPending(db, "rootfs"), "=> Devbox team-a/dev-a reset rootfs; changes apply on next start"; got != want {
+		t.Fatalf("formatDevboxResetPending = %q, want %q", got, want)
+	}
+	if got, want := formatDevboxResetStep(db, "nixstore"), "=> Devbox team-a/dev-a reset nixstore"; got != want {
+		t.Fatalf("formatDevboxResetStep = %q, want %q", got, want)
+	}
+	if got, want := formatDevboxResetConfirmation("team-a", "dev-a", devboxResetOptions{Root: true}), "Reset devbox team-a/dev-a\nDisks: rootfs\nThis discards selected disk data.\nContinue? [y/N] "; got != want {
+		t.Fatalf("formatDevboxResetConfirmation = %q, want %q", got, want)
 	}
 }
 

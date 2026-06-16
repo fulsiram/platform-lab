@@ -2,6 +2,7 @@ package devbox
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -38,6 +39,7 @@ type Devbox struct {
 	Name                    string
 	Owner                   string
 	PowerState              string
+	DiskGenerations         DiskGenerations
 	AuthorizedKeysConfigMap string
 	ExposedPorts            []int
 	Address                 string
@@ -46,11 +48,21 @@ type Devbox struct {
 	CreationTimestamp       time.Time
 }
 
+type DiskGenerations struct {
+	Root     int64
+	NixStore int64
+}
+
 type CreateOptions struct {
 	Namespace               string
 	Name                    string
 	AuthorizedKeysConfigMap string
 	ExposedPorts            []int
+}
+
+type ResetDiskOptions struct {
+	Root     bool
+	NixStore bool
 }
 
 type WaitOptions struct {
@@ -192,6 +204,54 @@ func SetPowerState(ctx context.Context, client dynamic.Interface, namespace stri
 	}
 	if err != nil {
 		return Devbox{}, fmt.Errorf("patch devbox %s/%s power state: %w", namespace, name, err)
+	}
+	return FromUnstructured(updated), nil
+}
+
+func ResetDiskGenerations(ctx context.Context, client dynamic.Interface, namespace string, name string, opts ResetDiskOptions) (Devbox, error) {
+	if namespace == "" {
+		return Devbox{}, fmt.Errorf("namespace is required")
+	}
+	if name == "" {
+		return Devbox{}, fmt.Errorf("name is required")
+	}
+	if !opts.Root && !opts.NixStore {
+		return Devbox{}, fmt.Errorf("at least one disk must be selected")
+	}
+
+	obj, err := client.Resource(Resource).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		return Devbox{}, fmt.Errorf("devbox %s/%s does not exist", namespace, name)
+	}
+	if err != nil {
+		return Devbox{}, fmt.Errorf("get devbox %s/%s: %w", namespace, name, err)
+	}
+
+	generations := DiskGenerationsFromUnstructured(obj)
+	if opts.Root {
+		generations.Root++
+	}
+	if opts.NixStore {
+		generations.NixStore++
+	}
+	patch, err := json.Marshal(map[string]any{
+		"spec": map[string]any{
+			"diskGenerations": map[string]any{
+				"root":     generations.Root,
+				"nixStore": generations.NixStore,
+			},
+		},
+	})
+	if err != nil {
+		return Devbox{}, fmt.Errorf("build disk reset patch: %w", err)
+	}
+
+	updated, err := client.Resource(Resource).Namespace(namespace).Patch(ctx, name, types.MergePatchType, patch, metav1.PatchOptions{})
+	if apierrors.IsNotFound(err) {
+		return Devbox{}, fmt.Errorf("devbox %s/%s does not exist", namespace, name)
+	}
+	if err != nil {
+		return Devbox{}, fmt.Errorf("patch devbox %s/%s disk generations: %w", namespace, name, err)
 	}
 	return FromUnstructured(updated), nil
 }
@@ -348,6 +408,13 @@ func VMPrintableStatus(ctx context.Context, client dynamic.Interface, namespace 
 	return VMPrintableStatusFromUnstructured(vm), nil
 }
 
+func DiskGenerationsFromUnstructured(item *unstructured.Unstructured) DiskGenerations {
+	return DiskGenerations{
+		Root:     nestedPositiveInt64(item, "spec", "diskGenerations", "root"),
+		NixStore: nestedPositiveInt64(item, "spec", "diskGenerations", "nixStore"),
+	}
+}
+
 func VMPrintableStatusFromUnstructured(item *unstructured.Unstructured) string {
 	status, _, _ := unstructured.NestedString(item.Object, "status", "printableStatus")
 	return status
@@ -366,6 +433,7 @@ func FromUnstructured(item *unstructured.Unstructured) Devbox {
 		Name:                    item.GetName(),
 		Owner:                   item.GetAnnotations()[OwnerAnnotation],
 		PowerState:              powerState,
+		DiskGenerations:         DiskGenerationsFromUnstructured(item),
 		AuthorizedKeysConfigMap: keysConfigMap,
 		ExposedPorts:            exposedPortsFromUnstructured(item),
 		Address:                 address,
@@ -510,6 +578,32 @@ func exposedPortsFromUnstructured(item *unstructured.Unstructured) []int {
 		}
 	}
 	return ports
+}
+
+func nestedPositiveInt64(item *unstructured.Unstructured, fields ...string) int64 {
+	value, found, _ := unstructured.NestedFieldNoCopy(item.Object, fields...)
+	if !found {
+		return 1
+	}
+	switch typed := value.(type) {
+	case int:
+		if typed > 0 {
+			return int64(typed)
+		}
+	case int32:
+		if typed > 0 {
+			return int64(typed)
+		}
+	case int64:
+		if typed > 0 {
+			return typed
+		}
+	case float64:
+		if typed > 0 && typed == float64(int64(typed)) {
+			return int64(typed)
+		}
+	}
+	return 1
 }
 
 func formatPorts(ports []int) string {

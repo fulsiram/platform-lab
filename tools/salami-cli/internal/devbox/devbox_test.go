@@ -30,6 +30,10 @@ func TestFromUnstructured(t *testing.T) {
 			"spec": map[string]any{
 				"powerState":   "Stopped",
 				"exposedPorts": []any{int64(22), int64(8080)},
+				"diskGenerations": map[string]any{
+					"root":     int64(3),
+					"nixStore": int64(5),
+				},
 				"authorizedKeysConfigMapRef": map[string]any{
 					"name": "user-ssh-keys",
 				},
@@ -53,6 +57,9 @@ func TestFromUnstructured(t *testing.T) {
 	}
 	if got.PowerState != "Stopped" {
 		t.Fatalf("PowerState = %q", got.PowerState)
+	}
+	if got.DiskGenerations.Root != 3 || got.DiskGenerations.NixStore != 5 {
+		t.Fatalf("DiskGenerations = %#v", got.DiskGenerations)
 	}
 	if got.AuthorizedKeysConfigMap != "user-ssh-keys" {
 		t.Fatalf("AuthorizedKeysConfigMap = %q", got.AuthorizedKeysConfigMap)
@@ -78,6 +85,13 @@ func TestFromUnstructuredDefaultsPowerState(t *testing.T) {
 	got := FromUnstructured(item)
 	if got.PowerState != "Running" {
 		t.Fatalf("PowerState = %q", got.PowerState)
+	}
+}
+
+func TestDiskGenerationsFromUnstructuredDefaultsMissingValues(t *testing.T) {
+	got := DiskGenerationsFromUnstructured(&unstructured.Unstructured{})
+	if got.Root != 1 || got.NixStore != 1 {
+		t.Fatalf("DiskGenerations = %#v, want root=1 nixStore=1", got)
 	}
 }
 
@@ -117,6 +131,77 @@ func TestListDevboxes(t *testing.T) {
 	}
 	if len(got) != 2 {
 		t.Fatalf("devboxes = %#v", got)
+	}
+}
+
+func TestResetDiskGenerations(t *testing.T) {
+	client := fake.NewSimpleDynamicClient(runtime.NewScheme())
+	devbox := newDevbox("team-a", "dev-a")
+	if err := unstructured.SetNestedField(devbox.Object, int64(3), "spec", "diskGenerations", "root"); err != nil {
+		t.Fatalf("set root generation: %v", err)
+	}
+	if err := unstructured.SetNestedField(devbox.Object, int64(5), "spec", "diskGenerations", "nixStore"); err != nil {
+		t.Fatalf("set nixStore generation: %v", err)
+	}
+	if _, err := client.Resource(Resource).Namespace("team-a").Create(context.Background(), devbox, metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create devbox: %v", err)
+	}
+
+	got, err := ResetDiskGenerations(context.Background(), client, "team-a", "dev-a", ResetDiskOptions{Root: true})
+	if err != nil {
+		t.Fatalf("ResetDiskGenerations root: %v", err)
+	}
+	if got.DiskGenerations.Root != 4 || got.DiskGenerations.NixStore != 5 {
+		t.Fatalf("root reset generations = %#v", got.DiskGenerations)
+	}
+
+	got, err = ResetDiskGenerations(context.Background(), client, "team-a", "dev-a", ResetDiskOptions{NixStore: true})
+	if err != nil {
+		t.Fatalf("ResetDiskGenerations nixStore: %v", err)
+	}
+	if got.DiskGenerations.Root != 4 || got.DiskGenerations.NixStore != 6 {
+		t.Fatalf("nixStore reset generations = %#v", got.DiskGenerations)
+	}
+
+	got, err = ResetDiskGenerations(context.Background(), client, "team-a", "dev-a", ResetDiskOptions{Root: true, NixStore: true})
+	if err != nil {
+		t.Fatalf("ResetDiskGenerations both: %v", err)
+	}
+	if got.DiskGenerations.Root != 5 || got.DiskGenerations.NixStore != 7 {
+		t.Fatalf("both reset generations = %#v", got.DiskGenerations)
+	}
+}
+
+func TestResetDiskGenerationsDefaultsMissingValues(t *testing.T) {
+	client := fake.NewSimpleDynamicClient(runtime.NewScheme())
+	if _, err := client.Resource(Resource).Namespace("team-a").Create(context.Background(), newDevbox("team-a", "dev-a"), metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create devbox: %v", err)
+	}
+
+	got, err := ResetDiskGenerations(context.Background(), client, "team-a", "dev-a", ResetDiskOptions{Root: true})
+	if err != nil {
+		t.Fatalf("ResetDiskGenerations: %v", err)
+	}
+	if got.DiskGenerations.Root != 2 || got.DiskGenerations.NixStore != 1 {
+		t.Fatalf("DiskGenerations = %#v, want root=2 nixStore=1", got.DiskGenerations)
+	}
+	obj, err := client.Resource(Resource).Namespace("team-a").Get(context.Background(), "dev-a", metav1.GetOptions{})
+	if err != nil {
+		t.Fatalf("get devbox: %v", err)
+	}
+	if _, found, _ := unstructured.NestedFieldNoCopy(obj.Object, "spec", "diskGenerations", "nixStore"); !found {
+		t.Fatalf("reset patch did not write nixStore generation: %#v", obj.Object)
+	}
+}
+
+func TestResetDiskGenerationsRequiresSelectedDisk(t *testing.T) {
+	client := fake.NewSimpleDynamicClient(runtime.NewScheme())
+	_, err := ResetDiskGenerations(context.Background(), client, "team-a", "dev-a", ResetDiskOptions{})
+	if err == nil {
+		t.Fatal("expected selected disk error")
+	}
+	if !strings.Contains(err.Error(), "at least one disk") {
+		t.Fatalf("error = %v", err)
 	}
 }
 

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"io"
@@ -39,6 +40,13 @@ type devboxDeleteOptions struct {
 type devboxPowerOptions struct {
 	NoWait  bool
 	Timeout time.Duration
+}
+
+type devboxResetOptions struct {
+	Root     bool
+	NixStore bool
+	Yes      bool
+	Timeout  time.Duration
 }
 
 func NewDevboxCmd(global *globalOptions) *cobra.Command {
@@ -356,6 +364,89 @@ func NewDevboxCmd(global *globalOptions) *cobra.Command {
 	}
 	restartCmd.Flags().DurationVar(&restartOpts.Timeout, "timeout", restartOpts.Timeout, "Maximum time to wait for each restart phase")
 
+	resetOpts := &devboxResetOptions{
+		Timeout: 10 * time.Minute,
+	}
+	resetCmd := &cobra.Command{
+		Use:   "reset NAME",
+		Short: "Reset Devbox disks to baseline",
+		Args:  devboxResetNameArg,
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return validateDevboxResetOptions(*resetOpts)
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			name := args[0]
+			cfg, client, err := devboxDynamicClient(cmd, global)
+			if err != nil {
+				return err
+			}
+			current, err := devbox.Get(cmd.Context(), client, cfg.Namespace, name)
+			if err != nil {
+				return err
+			}
+			if err := confirmDevboxReset(cmd, cfg.Namespace, name, *resetOpts); err != nil {
+				return err
+			}
+
+			startedAt := time.Now()
+			wasRunning := current.PowerState == "Running"
+			stopStartedAt := time.Now()
+			if wasRunning {
+				if _, err := devbox.SetPowerState(cmd.Context(), client, cfg.Namespace, name, "Stopped"); err != nil {
+					return err
+				}
+			}
+			if wasRunning || (current.VMPrintableStatus != "" && current.VMPrintableStatus != "Stopped") {
+				stopPrinter := newDevboxStopStatusPrinter(cmd.ErrOrStderr())
+				stopped, err := devbox.WaitForVMStatus(cmd.Context(), client, cfg.Namespace, name, "Stopped", devbox.WaitOptions{
+					Timeout:      resetOpts.Timeout,
+					PollInterval: time.Second,
+					OnUpdate:     stopPrinter.Update,
+				})
+				stopPrinter.Done()
+				if err != nil {
+					return err
+				}
+				fmt.Fprintln(cmd.ErrOrStderr(), formatDevboxStopped(stopped, time.Since(stopStartedAt)))
+			}
+
+			updated, err := devbox.ResetDiskGenerations(cmd.Context(), client, cfg.Namespace, name, devbox.ResetDiskOptions{
+				Root:     resetOpts.Root,
+				NixStore: resetOpts.NixStore,
+			})
+			if err != nil {
+				return err
+			}
+			fmt.Fprintln(cmd.ErrOrStderr(), formatDevboxResetStep(updated, formatDevboxResetTargets(*resetOpts)))
+			if !wasRunning {
+				fmt.Fprintln(cmd.OutOrStdout(), formatDevboxResetPending(updated, formatDevboxResetTargets(*resetOpts)))
+				return nil
+			}
+
+			if _, err := devbox.SetPowerState(cmd.Context(), client, cfg.Namespace, name, "Running"); err != nil {
+				return fmt.Errorf("reset applied, but failed to start devbox %s/%s: %w", cfg.Namespace, name, err)
+			}
+			startStartedAt := time.Now()
+			startPrinter := newDevboxStatusPrinter(cmd.ErrOrStderr())
+			waited, err := devbox.WaitForVMStatus(cmd.Context(), client, cfg.Namespace, name, "Running", devbox.WaitOptions{
+				Timeout:      resetOpts.Timeout,
+				PollInterval: time.Second,
+				OnUpdate:     startPrinter.Update,
+			})
+			startPrinter.Done()
+			if err != nil {
+				return fmt.Errorf("reset applied, but devbox %s/%s did not start: %w", cfg.Namespace, name, err)
+			}
+			fmt.Fprintln(cmd.ErrOrStderr(), formatDevboxStarted(waited, time.Since(startStartedAt)))
+			fmt.Fprintln(cmd.OutOrStdout(), formatDevboxReset(waited, formatDevboxResetTargets(*resetOpts), time.Since(startedAt)))
+			return nil
+		},
+	}
+	resetCmd.Flags().BoolVar(&resetOpts.Root, "root", false, "Reset the root filesystem disk to baseline")
+	resetCmd.Flags().BoolVar(&resetOpts.NixStore, "nixstore", false, "Reset the nixstore disk to baseline")
+	resetCmd.Flags().BoolVarP(&resetOpts.Yes, "yes", "y", false, "Confirm disk reset without prompting")
+	resetCmd.Flags().DurationVar(&resetOpts.Timeout, "timeout", resetOpts.Timeout, "Maximum time to wait for each reset phase")
+
 	cmd.AddCommand(
 		listCmd,
 		getCmd,
@@ -364,6 +455,7 @@ func NewDevboxCmd(global *globalOptions) *cobra.Command {
 		startCmd,
 		stopCmd,
 		restartCmd,
+		resetCmd,
 		NewDevboxSSHCmd(global),
 		NewDevboxSSHConfigCmd(global),
 		NewDevboxForwardCmd(global),
@@ -382,6 +474,46 @@ func devboxNameArg(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid devbox name %q: %s", args[0], errs[0])
 	}
 	return nil
+}
+
+func validateDevboxResetOptions(opts devboxResetOptions) error {
+	if !opts.Root && !opts.NixStore {
+		return fmt.Errorf("select at least one disk to reset with --root and/or --nixstore")
+	}
+	return nil
+}
+
+func devboxResetNameArg(cmd *cobra.Command, args []string) error {
+	if len(args) == 0 {
+		out := cmd.OutOrStdout()
+		cmd.SetOut(cmd.ErrOrStderr())
+		if err := cmd.Help(); err != nil {
+			cmd.SetOut(out)
+			return err
+		}
+		cmd.SetOut(out)
+	}
+	return devboxNameArg(cmd, args)
+}
+
+func confirmDevboxReset(cmd *cobra.Command, namespace string, name string, opts devboxResetOptions) error {
+	if opts.Yes {
+		return nil
+	}
+	if readerTerminalFile(cmd.InOrStdin()) == nil {
+		return fmt.Errorf("reset requires confirmation; rerun with --yes")
+	}
+	fmt.Fprint(cmd.ErrOrStderr(), formatDevboxResetConfirmation(namespace, name, opts))
+	answer, err := bufio.NewReader(cmd.InOrStdin()).ReadString('\n')
+	if err != nil && strings.TrimSpace(answer) == "" {
+		return fmt.Errorf("read reset confirmation: %w", err)
+	}
+	switch strings.ToLower(strings.TrimSpace(answer)) {
+	case "y", "yes":
+		return nil
+	default:
+		return fmt.Errorf("reset canceled")
+	}
 }
 
 func ensureDevboxSSHKeys(ctx context.Context, client kubernetes.Interface, namespace string, name string) error {
@@ -515,6 +647,18 @@ func terminalFile(w io.Writer) *os.File {
 	return file
 }
 
+func readerTerminalFile(r io.Reader) *os.File {
+	file, ok := r.(*os.File)
+	if !ok {
+		return nil
+	}
+	info, err := file.Stat()
+	if err != nil || info.Mode()&os.ModeCharDevice == 0 {
+		return nil
+	}
+	return file
+}
+
 func formatProgressLine(prefix string, elapsed string, terminal *os.File) string {
 	if terminal == nil {
 		return prefix + "  " + elapsed
@@ -563,6 +707,40 @@ func formatDevboxRestarted(db devbox.Devbox, elapsed time.Duration) string {
 
 func formatDevboxDeleted(namespace string, name string, elapsed time.Duration) string {
 	return fmt.Sprintf("=> Devbox %s/%s deleted in %s", dash(namespace), dash(name), roundedElapsed(elapsed))
+}
+
+func formatDevboxReset(db devbox.Devbox, targets string, elapsed time.Duration) string {
+	return fmt.Sprintf("=> Devbox %s/%s reset %s in %s", dash(db.Namespace), dash(db.Name), targets, roundedElapsed(elapsed))
+}
+
+func formatDevboxResetPending(db devbox.Devbox, targets string) string {
+	return fmt.Sprintf("=> Devbox %s/%s reset %s; changes apply on next start", dash(db.Namespace), dash(db.Name), targets)
+}
+
+func formatDevboxResetStep(db devbox.Devbox, targets string) string {
+	return fmt.Sprintf("=> Devbox %s/%s reset %s", dash(db.Namespace), dash(db.Name), targets)
+}
+
+func formatDevboxResetConfirmation(namespace string, name string, opts devboxResetOptions) string {
+	return fmt.Sprintf(
+		"Reset devbox %s/%s\nDisks: %s\nThis discards selected disk data.\nContinue? [y/N] ",
+		dash(namespace),
+		dash(name),
+		formatDevboxResetTargets(opts),
+	)
+}
+
+func formatDevboxResetTargets(opts devboxResetOptions) string {
+	if opts.Root && opts.NixStore {
+		return "rootfs and nixstore"
+	}
+	if opts.Root {
+		return "rootfs"
+	}
+	if opts.NixStore {
+		return "nixstore"
+	}
+	return "no disks"
 }
 
 func roundedElapsed(elapsed time.Duration) string {
