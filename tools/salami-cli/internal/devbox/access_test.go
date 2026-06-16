@@ -15,8 +15,11 @@ import (
 
 func TestResolveAccess(t *testing.T) {
 	dynamicClient := fake.NewSimpleDynamicClient(runtime.NewScheme())
-	if _, err := dynamicClient.Resource(Resource).Namespace("team-a").Create(context.Background(), accessDevbox(t, "team-a", "dev-a", "Running", "oidc:user@example.com", []int{22}), metav1.CreateOptions{}); err != nil {
+	if _, err := dynamicClient.Resource(Resource).Namespace("team-a").Create(context.Background(), accessDevbox(t, "team-a", "dev-a", "oidc:user@example.com", []int{22}), metav1.CreateOptions{}); err != nil {
 		t.Fatalf("create devbox: %v", err)
+	}
+	if _, err := dynamicClient.Resource(VirtualMachineResource).Namespace("team-a").Create(context.Background(), newVM("team-a", "dev-a", "Running"), metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create vm: %v", err)
 	}
 	kubeClient := kubefake.NewSimpleClientset(
 		accessService("team-a", "dev-a-svc", "dev-a", 22),
@@ -40,8 +43,11 @@ func TestResolveAccess(t *testing.T) {
 
 func TestResolveAccessRejectsStoppedDevbox(t *testing.T) {
 	dynamicClient := fake.NewSimpleDynamicClient(runtime.NewScheme())
-	if _, err := dynamicClient.Resource(Resource).Namespace("team-a").Create(context.Background(), accessDevbox(t, "team-a", "dev-a", "Stopped", "oidc:user@example.com", []int{22}), metav1.CreateOptions{}); err != nil {
+	if _, err := dynamicClient.Resource(Resource).Namespace("team-a").Create(context.Background(), accessDevbox(t, "team-a", "dev-a", "oidc:user@example.com", []int{22}), metav1.CreateOptions{}); err != nil {
 		t.Fatalf("create devbox: %v", err)
+	}
+	if _, err := dynamicClient.Resource(VirtualMachineResource).Namespace("team-a").Create(context.Background(), newVM("team-a", "dev-a", "Stopped"), metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create vm: %v", err)
 	}
 
 	_, err := ResolveAccess(context.Background(), dynamicClient, kubefake.NewSimpleClientset(), "team-a", "dev-a", "user@example.com", 22)
@@ -52,8 +58,11 @@ func TestResolveAccessRejectsStoppedDevbox(t *testing.T) {
 
 func TestResolveAccessRejectsOwnerMismatch(t *testing.T) {
 	dynamicClient := fake.NewSimpleDynamicClient(runtime.NewScheme())
-	if _, err := dynamicClient.Resource(Resource).Namespace("team-a").Create(context.Background(), accessDevbox(t, "team-a", "dev-a", "Running", "oidc:other@example.com", []int{22}), metav1.CreateOptions{}); err != nil {
+	if _, err := dynamicClient.Resource(Resource).Namespace("team-a").Create(context.Background(), accessDevbox(t, "team-a", "dev-a", "oidc:other@example.com", []int{22}), metav1.CreateOptions{}); err != nil {
 		t.Fatalf("create devbox: %v", err)
+	}
+	if _, err := dynamicClient.Resource(VirtualMachineResource).Namespace("team-a").Create(context.Background(), newVM("team-a", "dev-a", "Running"), metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create vm: %v", err)
 	}
 
 	_, err := ResolveAccess(context.Background(), dynamicClient, kubefake.NewSimpleClientset(), "team-a", "dev-a", "user@example.com", 22)
@@ -64,8 +73,11 @@ func TestResolveAccessRejectsOwnerMismatch(t *testing.T) {
 
 func TestResolveAccessRejectsMissingPort(t *testing.T) {
 	dynamicClient := fake.NewSimpleDynamicClient(runtime.NewScheme())
-	if _, err := dynamicClient.Resource(Resource).Namespace("team-a").Create(context.Background(), accessDevbox(t, "team-a", "dev-a", "Running", "oidc:user@example.com", []int{22}), metav1.CreateOptions{}); err != nil {
+	if _, err := dynamicClient.Resource(Resource).Namespace("team-a").Create(context.Background(), accessDevbox(t, "team-a", "dev-a", "oidc:user@example.com", []int{22}), metav1.CreateOptions{}); err != nil {
 		t.Fatalf("create devbox: %v", err)
+	}
+	if _, err := dynamicClient.Resource(VirtualMachineResource).Namespace("team-a").Create(context.Background(), newVM("team-a", "dev-a", "Running"), metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create vm: %v", err)
 	}
 
 	_, err := ResolveAccess(context.Background(), dynamicClient, kubefake.NewSimpleClientset(), "team-a", "dev-a", "user@example.com", 2222)
@@ -76,8 +88,11 @@ func TestResolveAccessRejectsMissingPort(t *testing.T) {
 
 func TestResolveAccessRejectsMissingRunningPod(t *testing.T) {
 	dynamicClient := fake.NewSimpleDynamicClient(runtime.NewScheme())
-	if _, err := dynamicClient.Resource(Resource).Namespace("team-a").Create(context.Background(), accessDevbox(t, "team-a", "dev-a", "Running", "oidc:user@example.com", []int{22}), metav1.CreateOptions{}); err != nil {
+	if _, err := dynamicClient.Resource(Resource).Namespace("team-a").Create(context.Background(), accessDevbox(t, "team-a", "dev-a", "oidc:user@example.com", []int{22}), metav1.CreateOptions{}); err != nil {
 		t.Fatalf("create devbox: %v", err)
+	}
+	if _, err := dynamicClient.Resource(VirtualMachineResource).Namespace("team-a").Create(context.Background(), newVM("team-a", "dev-a", "Running"), metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create vm: %v", err)
 	}
 	kubeClient := kubefake.NewSimpleClientset(
 		accessService("team-a", "dev-a-svc", "dev-a", 22),
@@ -90,7 +105,7 @@ func TestResolveAccessRejectsMissingRunningPod(t *testing.T) {
 	}
 }
 
-func accessDevbox(t *testing.T, namespace string, name string, vmStatus string, owner string, ports []int) *unstructured.Unstructured {
+func accessDevbox(t *testing.T, namespace string, name string, owner string, ports []int) *unstructured.Unstructured {
 	t.Helper()
 	obj, err := BuildObject(CreateOptions{
 		Namespace:               namespace,
@@ -102,9 +117,6 @@ func accessDevbox(t *testing.T, namespace string, name string, vmStatus string, 
 		t.Fatalf("BuildObject: %v", err)
 	}
 	obj.SetAnnotations(map[string]string{OwnerAnnotation: owner})
-	if err := unstructured.SetNestedField(obj.Object, vmStatus, "status", "vmPrintableStatus"); err != nil {
-		t.Fatalf("set status: %v", err)
-	}
 	return obj
 }
 

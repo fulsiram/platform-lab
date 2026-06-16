@@ -20,6 +20,10 @@ rules:
     resources:
       - pods/portforward
     verbs: ["create"]
+  - apiGroups: ["kubevirt.io"]
+    resources:
+      - virtualmachines
+    verbs: ["get", "list", "watch"]
   - apiGroups: ["platform.salami.network"]
     resources:
       - devboxes

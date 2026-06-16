@@ -35,9 +35,8 @@ func TestFromUnstructured(t *testing.T) {
 				},
 			},
 			"status": map[string]any{
-				"address":           "10.0.0.10",
-				"vmPrintableStatus": "Stopped",
-				"yggdrasilAddress":  "200::1",
+				"address":          "10.0.0.10",
+				"yggdrasilAddress": "200::1",
 			},
 		},
 	}
@@ -64,7 +63,7 @@ func TestFromUnstructured(t *testing.T) {
 	if got.Address != "10.0.0.10" {
 		t.Fatalf("Address = %q", got.Address)
 	}
-	if got.VMPrintableStatus != "Stopped" {
+	if got.VMPrintableStatus != "" {
 		t.Fatalf("VMPrintableStatus = %q", got.VMPrintableStatus)
 	}
 	if got.YggdrasilAddress != "200::1" {
@@ -86,13 +85,19 @@ func TestListDevboxes(t *testing.T) {
 	scheme := runtime.NewScheme()
 	client := fake.NewSimpleDynamicClientWithCustomListKinds(
 		scheme,
-		map[schema.GroupVersionResource]string{Resource: "DevboxList"},
+		testListKinds(),
 	)
 	if _, err := client.Resource(Resource).Namespace("team-a").Create(context.Background(), newDevbox("team-a", "dev-a"), metav1.CreateOptions{}); err != nil {
 		t.Fatalf("create dev-a: %v", err)
 	}
 	if _, err := client.Resource(Resource).Namespace("team-b").Create(context.Background(), newDevbox("team-b", "dev-b"), metav1.CreateOptions{}); err != nil {
 		t.Fatalf("create dev-b: %v", err)
+	}
+	if _, err := client.Resource(VirtualMachineResource).Namespace("team-a").Create(context.Background(), newVM("team-a", "dev-a", "Running"), metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create vm dev-a: %v", err)
+	}
+	if _, err := client.Resource(VirtualMachineResource).Namespace("team-b").Create(context.Background(), newVM("team-b", "dev-b", "Stopped"), metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create vm dev-b: %v", err)
 	}
 
 	got, err := List(context.Background(), client, "team-a", false)
@@ -101,6 +106,9 @@ func TestListDevboxes(t *testing.T) {
 	}
 	if len(got) != 1 || got[0].Name != "dev-a" {
 		t.Fatalf("devboxes = %#v", got)
+	}
+	if got[0].VMPrintableStatus != "Running" {
+		t.Fatalf("VMPrintableStatus = %q", got[0].VMPrintableStatus)
 	}
 
 	got, err = List(context.Background(), client, "", true)
@@ -239,15 +247,15 @@ func TestSetPowerState(t *testing.T) {
 
 func TestWaitForRunning(t *testing.T) {
 	obj := newDevbox("team-a", "dev-a")
-	if err := unstructured.SetNestedField(obj.Object, "Running", "status", "vmPrintableStatus"); err != nil {
-		t.Fatalf("set status: %v", err)
-	}
 	client := fake.NewSimpleDynamicClientWithCustomListKinds(
 		runtime.NewScheme(),
-		map[schema.GroupVersionResource]string{Resource: "DevboxList"},
+		testListKinds(),
 	)
 	if _, err := client.Resource(Resource).Namespace("team-a").Create(context.Background(), obj, metav1.CreateOptions{}); err != nil {
 		t.Fatalf("create devbox: %v", err)
+	}
+	if _, err := client.Resource(VirtualMachineResource).Namespace("team-a").Create(context.Background(), newVM("team-a", "dev-a", "Running"), metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create vm: %v", err)
 	}
 
 	var updates int
@@ -271,15 +279,15 @@ func TestWaitForRunning(t *testing.T) {
 
 func TestWaitForVMStatus(t *testing.T) {
 	obj := newDevbox("team-a", "dev-a")
-	if err := unstructured.SetNestedField(obj.Object, "Stopped", "status", "vmPrintableStatus"); err != nil {
-		t.Fatalf("set status: %v", err)
-	}
 	client := fake.NewSimpleDynamicClientWithCustomListKinds(
 		runtime.NewScheme(),
-		map[schema.GroupVersionResource]string{Resource: "DevboxList"},
+		testListKinds(),
 	)
 	if _, err := client.Resource(Resource).Namespace("team-a").Create(context.Background(), obj, metav1.CreateOptions{}); err != nil {
 		t.Fatalf("create devbox: %v", err)
+	}
+	if _, err := client.Resource(VirtualMachineResource).Namespace("team-a").Create(context.Background(), newVM("team-a", "dev-a", "Stopped"), metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create vm: %v", err)
 	}
 
 	got, err := WaitForVMStatus(context.Background(), client, "team-a", "dev-a", "Stopped", WaitOptions{
@@ -296,15 +304,15 @@ func TestWaitForVMStatus(t *testing.T) {
 
 func TestWaitForRunningTimesOut(t *testing.T) {
 	obj := newDevbox("team-a", "dev-a")
-	if err := unstructured.SetNestedField(obj.Object, "Provisioning", "status", "vmPrintableStatus"); err != nil {
-		t.Fatalf("set status: %v", err)
-	}
 	client := fake.NewSimpleDynamicClientWithCustomListKinds(
 		runtime.NewScheme(),
-		map[schema.GroupVersionResource]string{Resource: "DevboxList"},
+		testListKinds(),
 	)
 	if _, err := client.Resource(Resource).Namespace("team-a").Create(context.Background(), obj, metav1.CreateOptions{}); err != nil {
 		t.Fatalf("create devbox: %v", err)
+	}
+	if _, err := client.Resource(VirtualMachineResource).Namespace("team-a").Create(context.Background(), newVM("team-a", "dev-a", "Provisioning"), metav1.CreateOptions{}); err != nil {
+		t.Fatalf("create vm: %v", err)
 	}
 
 	got, err := WaitForRunning(context.Background(), client, "team-a", "dev-a", WaitOptions{
@@ -454,4 +462,32 @@ func newDevbox(namespace, name string) *unstructured.Unstructured {
 	item.SetName(name)
 	item.SetCreationTimestamp(metav1.Now())
 	return item
+}
+
+func newVM(namespace, name string, printableStatus string) *unstructured.Unstructured {
+	item := &unstructured.Unstructured{
+		Object: map[string]any{
+			"apiVersion": "kubevirt.io/v1",
+			"kind":       "VirtualMachine",
+			"metadata": map[string]any{
+				"labels": map[string]any{
+					DevboxLabel: name,
+				},
+			},
+			"status": map[string]any{
+				"printableStatus": printableStatus,
+			},
+		},
+	}
+	item.SetGroupVersionKind(VirtualMachineResource.GroupVersion().WithKind("VirtualMachine"))
+	item.SetNamespace(namespace)
+	item.SetName(name)
+	return item
+}
+
+func testListKinds() map[schema.GroupVersionResource]string {
+	return map[schema.GroupVersionResource]string{
+		Resource:               "DevboxList",
+		VirtualMachineResource: "VirtualMachineList",
+	}
 }

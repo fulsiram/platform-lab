@@ -16,12 +16,21 @@ import (
 	"k8s.io/client-go/dynamic"
 )
 
-const OwnerAnnotation = "platform.salami.network/owner"
+const (
+	OwnerAnnotation = "platform.salami.network/owner"
+	DevboxLabel     = "platform.salami.network/devbox"
+)
 
 var Resource = schema.GroupVersionResource{
 	Group:    "platform.salami.network",
 	Version:  "v1",
 	Resource: "devboxes",
+}
+
+var VirtualMachineResource = schema.GroupVersionResource{
+	Group:    "kubevirt.io",
+	Version:  "v1",
+	Resource: "virtualmachines",
 }
 
 type Devbox struct {
@@ -68,6 +77,9 @@ func List(ctx context.Context, client dynamic.Interface, namespace string, allNa
 	devboxes := make([]Devbox, 0, len(list.Items))
 	for i := range list.Items {
 		devboxes = append(devboxes, FromUnstructured(&list.Items[i]))
+	}
+	if err := AttachVMStatuses(ctx, client, devboxes, namespace, allNamespaces); err != nil {
+		return nil, err
 	}
 	return devboxes, nil
 }
@@ -137,7 +149,13 @@ func Get(ctx context.Context, client dynamic.Interface, namespace string, name s
 	if err != nil {
 		return Devbox{}, fmt.Errorf("get devbox %s/%s: %w", namespace, name, err)
 	}
-	return FromUnstructured(obj), nil
+	devbox := FromUnstructured(obj)
+	vmStatus, err := VMPrintableStatus(ctx, client, namespace, name)
+	if err != nil {
+		return Devbox{}, err
+	}
+	devbox.VMPrintableStatus = vmStatus
+	return devbox, nil
 }
 
 func Delete(ctx context.Context, client dynamic.Interface, namespace string, name string) error {
@@ -253,6 +271,11 @@ func WaitForDeleted(ctx context.Context, client dynamic.Interface, namespace str
 			return fmt.Errorf("get devbox %s/%s: %w", namespace, name, err)
 		}
 		last = FromUnstructured(obj)
+		vmStatus, err := VMPrintableStatus(ctx, client, namespace, name)
+		if err != nil {
+			return err
+		}
+		last.VMPrintableStatus = vmStatus
 		if opts.OnUpdate != nil {
 			opts.OnUpdate(last, time.Since(started))
 		}
@@ -270,6 +293,66 @@ func WaitForDeleted(ctx context.Context, client dynamic.Interface, namespace str
 	}
 }
 
+func AttachVMStatuses(ctx context.Context, client dynamic.Interface, devboxes []Devbox, namespace string, allNamespaces bool) error {
+	if len(devboxes) == 0 {
+		return nil
+	}
+	resource := client.Resource(VirtualMachineResource)
+	var list *unstructured.UnstructuredList
+	var err error
+	if allNamespaces {
+		list, err = resource.List(ctx, metav1.ListOptions{LabelSelector: DevboxLabel})
+	} else {
+		if namespace == "" {
+			return fmt.Errorf("namespace is required")
+		}
+		list, err = resource.Namespace(namespace).List(ctx, metav1.ListOptions{LabelSelector: DevboxLabel})
+	}
+	if err != nil {
+		return fmt.Errorf("list virtualmachines for devbox statuses: %w", err)
+	}
+
+	statuses := map[string]string{}
+	for i := range list.Items {
+		vm := &list.Items[i]
+		devboxName := vm.GetLabels()[DevboxLabel]
+		if devboxName == "" {
+			continue
+		}
+		key := namespacedName(vm.GetNamespace(), devboxName)
+		status := VMPrintableStatusFromUnstructured(vm)
+		if vm.GetName() == devboxName || statuses[key] == "" {
+			statuses[key] = status
+		}
+	}
+	for i := range devboxes {
+		devboxes[i].VMPrintableStatus = statuses[namespacedName(devboxes[i].Namespace, devboxes[i].Name)]
+	}
+	return nil
+}
+
+func VMPrintableStatus(ctx context.Context, client dynamic.Interface, namespace string, name string) (string, error) {
+	if namespace == "" {
+		return "", fmt.Errorf("namespace is required")
+	}
+	if name == "" {
+		return "", fmt.Errorf("name is required")
+	}
+	vm, err := client.Resource(VirtualMachineResource).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
+	if apierrors.IsNotFound(err) {
+		return "", nil
+	}
+	if err != nil {
+		return "", fmt.Errorf("get virtualmachine %s/%s: %w", namespace, name, err)
+	}
+	return VMPrintableStatusFromUnstructured(vm), nil
+}
+
+func VMPrintableStatusFromUnstructured(item *unstructured.Unstructured) string {
+	status, _, _ := unstructured.NestedString(item.Object, "status", "printableStatus")
+	return status
+}
+
 func FromUnstructured(item *unstructured.Unstructured) Devbox {
 	powerState, _, _ := unstructured.NestedString(item.Object, "spec", "powerState")
 	if powerState == "" {
@@ -277,7 +360,6 @@ func FromUnstructured(item *unstructured.Unstructured) Devbox {
 	}
 	keysConfigMap, _, _ := unstructured.NestedString(item.Object, "spec", "authorizedKeysConfigMapRef", "name")
 	address, _, _ := unstructured.NestedString(item.Object, "status", "address")
-	vmStatus, _, _ := unstructured.NestedString(item.Object, "status", "vmPrintableStatus")
 	yggAddress, _, _ := unstructured.NestedString(item.Object, "status", "yggdrasilAddress")
 	return Devbox{
 		Namespace:               item.GetNamespace(),
@@ -287,7 +369,6 @@ func FromUnstructured(item *unstructured.Unstructured) Devbox {
 		AuthorizedKeysConfigMap: keysConfigMap,
 		ExposedPorts:            exposedPortsFromUnstructured(item),
 		Address:                 address,
-		VMPrintableStatus:       vmStatus,
 		YggdrasilAddress:        yggAddress,
 		CreationTimestamp:       item.GetCreationTimestamp().Time,
 	}
@@ -402,6 +483,10 @@ func valueOrDash(value string) string {
 		return "-"
 	}
 	return value
+}
+
+func namespacedName(namespace string, name string) string {
+	return namespace + "/" + name
 }
 
 func exposedPortsFromUnstructured(item *unstructured.Unstructured) []int {

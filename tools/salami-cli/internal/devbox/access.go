@@ -62,7 +62,7 @@ func ResolveAccess(ctx context.Context, dynamicClient dynamic.Interface, kubeCli
 }
 
 func resolveService(ctx context.Context, client kubernetes.Interface, namespace string, devboxName string, remotePort int) (corev1.Service, error) {
-	selector := labels.Set{"platform.salami.network/devbox": devboxName}.String()
+	selector := labels.Set{DevboxLabel: devboxName}.String()
 	services, err := client.CoreV1().Services(namespace).List(ctx, metav1.ListOptions{LabelSelector: selector})
 	if err != nil {
 		return corev1.Service{}, fmt.Errorf("list services for devbox %s/%s: %w", namespace, devboxName, err)
