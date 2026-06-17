@@ -7,7 +7,7 @@ spec:
   project: default
   sources:
     - repoURL: https://openebs.github.io/openebs
-      chart: openebs-zfs
+      chart: openebs
       targetRevision: 4.5.0
       helm:
         releaseName: openebs-zfs
