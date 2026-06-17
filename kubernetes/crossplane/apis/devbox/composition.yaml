@@ -64,7 +64,6 @@ spec:
                   spec:
                     source:
                       pvc:
-                        namespace: team-akaia
                         name: rootdisk-baseline
                     storage:
                       accessModes: [ReadWriteOnce]
@@ -80,7 +79,6 @@ spec:
                   spec:
                     source:
                       pvc:
-                        namespace: team-akaia
                         name: nixstore-baseline
                     storage:
                       accessModes: [ReadWriteOnce]
