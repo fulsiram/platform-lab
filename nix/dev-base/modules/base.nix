@@ -21,7 +21,7 @@
 
   services.qemuGuest.enable = true;
   services.openssh.enable = true;
-  services.cloud-init.enable = true;
+  services.cloud-init.enable = false;
   systemd.services."serial-getty@ttyS0".enable = true;
 
   services.userborn.enable = true;
