@@ -26,6 +26,18 @@
 
   services.userborn.enable = true;
 
+  systemd.network.enable = true;
+  networking.useDHCP = false;
+
+  systemd.network.networks."10-enp3s0" = {
+    matchConfig.Name = "enp3s0";
+    networkConfig = {
+      DHCP = "ipv4";
+      IPv6AcceptRA = true;
+    };
+    linkConfig.RequiredForOnline = "routable";
+  };
+
   fileSystems."/persistent" = {
     device = "/dev/disk/by-id/virtio-PERSISTENT";
     fsType = "ext4";
