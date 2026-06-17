@@ -29,11 +29,11 @@
       },
       "locked": {
         "dir": "nix/dev-base",
-        "lastModified": 1779486800,
-        "narHash": "sha256-wnpwzzVF7rv/l28qAXhnNl/1k5ddV1NLVy4yaZopX9g=",
+        "lastModified": 1781734223,
+        "narHash": "sha256-jmPimB0vEVInueNfVCbitxna67afpYyX3bAFo5bgqh4=",
         "owner": "fulsiram",
         "repo": "homelab",
-        "rev": "79321c1fb633141015985c4533a2f29d123136c9",
+        "rev": "9098626a36918491870d948cc1e24e4cbb1c15f4",
         "type": "github"
       },
       "original": {
