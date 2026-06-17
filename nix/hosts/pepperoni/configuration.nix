@@ -11,6 +11,8 @@
     ./networking.nix
   ];
 
+  # disko.zfs.enable = true;
+
   # sops.secrets.ssh_public_key = {
   #   neededForUsers = true;
   # };
@@ -44,6 +46,7 @@
   services.k3s.enable = true;
   services.k3s.extraFlags = [
     "--cluster-init"
+    "--nonroot-devices"
     "--flannel-backend=none"
     "--disable-kube-proxy"
     "--disable-network-policy"
