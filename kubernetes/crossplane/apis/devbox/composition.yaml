@@ -40,7 +40,8 @@ spec:
               resources:
                 requests:
                   storage: 10Gi
-              storageClassName: local-path
+              storageClassName: zfspv-block
+              volumeMode: Block
 
 
             ---
@@ -62,30 +63,32 @@ spec:
                       platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
                   spec:
                     source:
-                      registry:
-                        url: docker://harbor.salami.network/kubevirt-rootdisks/nixos:latest
-                        secretRef: harbor-creds-cdi
+                      pvc:
+                        namespace: team-akaia
+                        name: rootdisk-baseline
                     storage:
                       accessModes: [ReadWriteOnce]
                       resources:
                         requests:
                           storage: 5Gi
-                      storageClassName: local-path
+                      storageClassName: zfspv-block
+                      volumeMode: Block
                 - metadata:
                     name: {{ .observed.composite.resource.metadata.name }}-nixstore-g{{ .observed.composite.resource.spec.diskGenerations.nixStore }}
                     labels:
                       platform.salami.network/devbox: {{ .observed.composite.resource.metadata.name }}
                   spec:
                     source:
-                      registry:
-                        url: docker://harbor.salami.network/kubevirt-rootdisks/nixos-nix:latest
-                        secretRef: harbor-creds-cdi
+                      pvc:
+                        namespace: team-akaia
+                        name: nixstore-baseline
                     storage:
                       accessModes: [ReadWriteOnce]
                       resources:
                         requests:
                           storage: 30Gi
-                      storageClassName: local-path
+                      storageClassName: zfspv-block
+                      volumeMode: Block
               template:
                 metadata:
                   labels:
