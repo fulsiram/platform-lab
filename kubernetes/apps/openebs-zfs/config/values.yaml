@@ -20,3 +20,7 @@ loki:
 
 alloy:
   enabled: false
+
+zfs-localpv:
+  zfs:
+    bin: /run/current-system/sw/bin/zfs
