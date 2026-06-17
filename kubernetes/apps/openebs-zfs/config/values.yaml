@@ -1,0 +1,22 @@
+engines:
+  local:
+    zfs:
+      enabled: true
+    lvm:
+      enabled: false
+    hostpath:
+      enabled: false
+    rawfile:
+      enabled: false
+  replicated:
+    mayastor:
+      enabled: false
+
+preUpgradeHook:
+  enabled: false
+
+loki:
+  enabled: false
+
+alloy:
+  enabled: false
