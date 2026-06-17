@@ -51,8 +51,8 @@
     ];
 
     script = ''
-      growpart /dev/disk/by-id/virtio-NIXSTORE 1 || true;
-      resize2fs /dev/disk/by-id/virtio-NIXSTORE-part1
+      growpart /dev/disk/by-id/virtio-NIXSTORE 2 || true;
+      resize2fs /dev/disk/by-id/virtio-NIXSTORE-part2
     '';
   };
 
