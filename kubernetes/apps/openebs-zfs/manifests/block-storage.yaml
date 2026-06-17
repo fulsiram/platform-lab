@@ -1,0 +1,8 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: zfspv-block
+provisioner: zfs.csi.openebs.io
+allowVolumeExpansion: true
+parameters:
+  poolname: "zroot/zcrypted/openebs/pv1"

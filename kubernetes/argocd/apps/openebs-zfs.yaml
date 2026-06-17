@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openebs-zfs
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://openebs.github.io/openebs
+      chart: openebs-zfs
+      targetRevision: 4.5.0
+      helm:
+        releaseName: openebs-zfs
+        valueFiles:
+          - $values/kubernetes/apps/openebs-zfs/config/values.yaml
+    - repoURL: https://github.com/fulsiram/platform-lab.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://github.com/fulsiram/platform-lab.git
+      targetRevision: main
+      path: kubernetes/apps/openebs-zfs/manifests/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openebs
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
