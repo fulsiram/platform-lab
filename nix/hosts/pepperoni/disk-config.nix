@@ -24,15 +24,11 @@
                 mountOptions = [ "umask=0077" ];
               };
             };
-            crypt_p1 = {
-              label = "crypt_p1";
+            zfs = {
               size = "100%";
               content = {
-                type = "luks";
-                name = "p1"; # device-mapper name when decrypted
-                settings = {
-                  allowDiscards = true;
-                };
+                type = "zfs";
+                pool = "zroot";
               };
             };
           };
@@ -58,53 +54,72 @@
                 mountOptions = [ "umask=0077" ];
               };
             };
-            crypt_p2 = {
-              label = "crypt_p2";
+            zfs = {
               size = "100%";
               content = {
-                type = "luks";
-                name = "p2";
-                # Remove settings.keyFile if you want to use interactive password entry
-                settings = {
-                  allowDiscards = true;
-                };
-                content = {
-                  type = "btrfs";
-                  extraArgs = [
-                    "-d raid1"
-                    "/dev/mapper/p1" # Use decrypted mapped device, same name as defined in disk1
-                  ];
-                  subvolumes = {
-                    "/root" = {
-                      mountpoint = "/";
-                      mountOptions = [
-                        "compress=zstd"
-                        "noatime"
-                        "ssd"
-                        "x-systemd.device-timeout=infinity"
-                        "x-systemd.requires=dev-mapper-p1.device"
-                      ];
-                    };
-                    "/home" = {
-                      mountpoint = "/home";
-                      mountOptions = [
-                        "compress=zstd"
-                        "noatime"
-                        "ssd"
-                      ];
-                    };
-                    "/nix" = {
-                      mountpoint = "/nix";
-                      mountOptions = [
-                        "compress=zstd"
-                        "noatime"
-                        "ssd"
-                      ];
-                    };
-                  };
-                };
+                type = "zfs";
+                pool = "zroot";
               };
             };
+          };
+        };
+      };
+    };
+
+    zpool = {
+      zroot = {
+        type = "zpool";
+        mode = "mirror";
+
+        options = {
+          ashift = "12";
+        };
+
+        rootFsOptions = {
+          mountpoint = "none";
+          canmount = "off";
+        };
+
+        datasets = {
+          "zcrypted" = {
+            type = "zfs_fs";
+            options = {
+              mountpoint = "none";
+              canmount = "off";
+              encryption = "aes-256-gcm";
+              keyformat = "passphrase";
+              keylocation = "prompt";
+            };
+          };
+          "zcrypted/system" = {
+            type = "zfs_fs";
+            options = {
+              mountpoint = "none";
+              canmount = "off";
+
+              atime = "off";
+              xattr = "sa";
+              acltype = "posixacl";
+              dnodesize = "auto";
+
+              compression = "zstd";
+            };
+          };
+          "zcrypted/system/root" = {
+            type = "zfs_fs";
+            mountpoint = "/";
+          };
+          "zcrypted/system/home" = {
+            type = "zfs_fs";
+            mountpoint = "/home";
+          };
+          "zcrypted/system/nix" = {
+            type = "zfs_fs";
+            mountpoint = "/nix";
+          };
+          "zcrypted/system/var" = {
+            type = "zfs_fs";
+            mountpoint = "/var";
           };
         };
       };

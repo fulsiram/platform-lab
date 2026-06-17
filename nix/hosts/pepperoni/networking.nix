@@ -21,6 +21,7 @@ let
   };
 in
 {
+  networking.hostId = "c35b0c44";
   networking.hostName = "pepperoni";
   networking.nameservers = [
     "1.1.1.1"

@@ -1,6 +1,8 @@
 { lib, ... }:
 {
   boot = {
+    zfs.forceImportRoot = false;
+
     loader = {
       grub = {
         enable = true;
@@ -26,8 +28,8 @@
 
     kernelParams = [ "ip=162.55.238.111::162.55.238.65:255.255.255.255:::none" ];
     initrd = {
-      luks.devices.p1.device = lib.mkForce "/dev/disk/by-partlabel/crypt_p1";
-      luks.devices.p2.device = lib.mkForce "/dev/disk/by-partlabel/crypt_p2";
+      # luks.devices.p1.device = lib.mkForce "/dev/disk/by-partlabel/crypt_p1";
+      # luks.devices.p2.device = lib.mkForce "/dev/disk/by-partlabel/crypt_p2";
 
       # luks.reusePassphrases = true;
 

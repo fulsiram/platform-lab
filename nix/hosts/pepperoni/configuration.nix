@@ -11,9 +11,9 @@
     ./networking.nix
   ];
 
-  sops.secrets.ssh_public_key = {
-    neededForUsers = true;
-  };
+  # sops.secrets.ssh_public_key = {
+  #   neededForUsers = true;
+  # };
 
   services.openssh.enable = true;
 
