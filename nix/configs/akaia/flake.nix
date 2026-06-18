@@ -53,6 +53,6 @@
         ];
       };
 
-      packages.x86_64-linux.images = self.nixosConfigurations.system.config.system.build.diskoImages;
+      packages.x86_64-linux.images = self.nixosConfigurations.nixos.config.system.build.diskoImages;
     };
 }
