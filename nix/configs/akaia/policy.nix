@@ -35,15 +35,15 @@
     '';
   };
 
-  services.yggdrasil = {
-    persistentKeys = false;
-    enable = true;
-    settings.Peers = [
-      # akaia.org
-      "tls://185.195.236.220:42137"
-      "tls://sto01.yggdrasil.hosted-by.skhron.eu:8884"
-    ];
-    settings.PrivateKeyPath = "/secrets/yggdrasil/privateKey.pem";
+  continuity.nodeSettings = {
+    yggdrasil = {
+      outboundPeerURIs = [
+        # akaia.org
+        "tls://185.195.236.220:42137"
+        "tls://sto01.yggdrasil.hosted-by.skhron.eu:8884"
+      ];
+      privateKeyPath = "/secrets/yggdrasil/privateKey.pem";
+    };
   };
 
   systemd.services.yggdrasil = {
