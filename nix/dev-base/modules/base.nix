@@ -7,14 +7,34 @@
 }:
 {
   imports = [
-    "${modulesPath}/profiles/qemu-guest.nix"
+    # "${modulesPath}/profiles/qemu-guest.nix"
     ./disk-config.nix
   ];
 
+  boot.initrd.kernelModules = [
+    "virtio_mmio"
+    "virtio_pci"
+    "virtio_blk"
+    "virtiofs"
+  ];
+
+  boot.blacklistedKernelModules = [
+    "rfkill"
+    "intel_pstate"
+  ];
+
+  boot.initrd.systemd.tpm2.enable = false;
+  systemd.tpm2.enable = false;
+  boot.swraid.enable = false;
+
   boot.growPartition = true;
-  boot.kernelParams = [ "console=ttyS0" ];
+  boot.kernelParams = [
+    "console=ttyS0"
+    "8250.nr_uarts=1"
+  ];
   boot.loader.timeout = 0;
 
+  boot.loader.grub.enable = false;
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = false;
 
