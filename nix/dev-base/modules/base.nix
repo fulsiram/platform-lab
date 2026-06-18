@@ -22,6 +22,14 @@
   # boot.loader.grub.efiInstallAsRemovable = true;
   # boot.loader.grub.device = "nodev";
 
+  boot.initrd.includeDefaultModules = false;
+  boot.initrd.availableKernelModules = [
+    "ahci"
+    "virtio_pci"
+    "virtio_scsi"
+    "virtio_blk"
+  ];
+
   services.qemuGuest.enable = true;
   services.openssh.enable = true;
   services.cloud-init.enable = false;
