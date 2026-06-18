@@ -27,13 +27,14 @@
   systemd.tpm2.enable = false;
   boot.swraid.enable = false;
 
-  boot.growPartition = true;
+  boot.growPartition = false;
+  systemd.services.grow-partitions.enable = false;
+
   boot.kernelParams = [
     "console=ttyS0"
     "8250.nr_uarts=1"
   ];
   boot.loader.timeout = 0;
-
   boot.loader.grub.enable = false;
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = false;
