@@ -4,11 +4,11 @@
       "flake": false,
       "locked": {
         "dir": "nix/configs/akaia",
-        "lastModified": 1781755996,
-        "narHash": "sha256-FF+deg3Twp1JmngF/ZfaXvjMhutdgmL6XlSAgTAePdg=",
+        "lastModified": 1781771518,
+        "narHash": "sha256-tEEjtMi5Wvq501a1znW0ARgvGKsX1g81puCe1q9iY9A=",
         "owner": "fulsiram",
         "repo": "homelab",
-        "rev": "e2e5a31c4c58957114fe7db541100f800eba1aca",
+        "rev": "4ad2ad58e899029624dc1c431a9566872dd2193b",
         "type": "github"
       },
       "original": {
@@ -16,6 +16,24 @@
         "owner": "fulsiram",
         "repo": "homelab",
         "type": "github"
+      }
+    },
+    "any-sync-compose": {
+      "flake": false,
+      "locked": {
+        "dir": "dependencies/git/anyproto/any-sync-dockercompose",
+        "lastModified": 1781562348,
+        "narHash": "sha256-kx7kUUCcRp4Ov8zTCVYm6i3YthfCeJU0Q0oZdSr8WaE=",
+        "ref": "refs/heads/main",
+        "rev": "0d315e8054a09d5589a34fcafe090e54c315f243",
+        "revCount": 221,
+        "type": "git",
+        "url": "https://codeberg.org/Akaia_Collective/dstk"
+      },
+      "original": {
+        "dir": "dependencies/git/anyproto/any-sync-dockercompose",
+        "type": "git",
+        "url": "https://codeberg.org/Akaia_Collective/dstk"
       }
     },
     "base": {
@@ -29,11 +47,11 @@
       },
       "locked": {
         "dir": "nix/dev-base",
-        "lastModified": 1781755996,
-        "narHash": "sha256-FF+deg3Twp1JmngF/ZfaXvjMhutdgmL6XlSAgTAePdg=",
+        "lastModified": 1781771518,
+        "narHash": "sha256-tEEjtMi5Wvq501a1znW0ARgvGKsX1g81puCe1q9iY9A=",
         "owner": "fulsiram",
         "repo": "homelab",
-        "rev": "e2e5a31c4c58957114fe7db541100f800eba1aca",
+        "rev": "4ad2ad58e899029624dc1c431a9566872dd2193b",
         "type": "github"
       },
       "original": {
@@ -48,17 +66,39 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1779226674,
-        "narHash": "sha256-wuOkjI6pRiN4sEn/EPBRnNW5cmcpvd7xtIM8y5LooAs=",
+        "lastModified": 1781152676,
+        "narHash": "sha256-RxWs5ND31KzTG7wvMM+PMfUjyNpmIEr999lqNARaM5o=",
         "owner": "nix-community",
         "repo": "disko",
-        "rev": "65fb947964bd44fc0008faf77d1fcb7a9f40bb32",
+        "rev": "ff8702b4de27f72b4c78573dfb89ec74e36abdf1",
         "type": "github"
       },
       "original": {
         "owner": "nix-community",
         "repo": "disko",
         "type": "github"
+      }
+    },
+    "dstk": {
+      "inputs": {
+        "any-sync-compose": "any-sync-compose",
+        "nixpkgs-caddy": "nixpkgs-caddy",
+        "nixpkgs-unstable": "nixpkgs-unstable"
+      },
+      "locked": {
+        "dir": "projects/continuity_os/system",
+        "lastModified": 1781562348,
+        "narHash": "sha256-kx7kUUCcRp4Ov8zTCVYm6i3YthfCeJU0Q0oZdSr8WaE=",
+        "ref": "refs/heads/main",
+        "rev": "0d315e8054a09d5589a34fcafe090e54c315f243",
+        "revCount": 221,
+        "type": "git",
+        "url": "https://codeberg.org/Akaia_Collective/dstk"
+      },
+      "original": {
+        "dir": "projects/continuity_os/system",
+        "type": "git",
+        "url": "https://codeberg.org/Akaia_Collective/dstk"
       }
     },
     "home-manager": {
@@ -103,16 +143,49 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1778036283,
-        "narHash": "sha256-62EWg6lI0qyzm7oAx5cAnGkLutvJsRBe0KkEW2JDZCE=",
+        "lastModified": 1780930886,
+        "narHash": "sha256-rppURzHviaQN131F+nLiLdGfcb0uCd9gGP0E5+iw9MI=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "ed67bc86e84e51d4a88e73c7fd36006dc876476f",
+        "rev": "8c3cede7ddc26bd659d2d383b5610efbd2c7a16e",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
         "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-caddy": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777954456,
+        "narHash": "sha256-hGdgeU2Nk87RAuZyYjyDjFL6LK7dAZN5RE9+hrDTkDU=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+        "type": "github"
+      }
+    },
+    "nixpkgs-unstable": {
+      "locked": {
+        "lastModified": 1781577229,
+        "narHash": "sha256-lrp67w8AulE9Ks53n27I45ADSzbOCn4H+CNW1Ck8B+8=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -135,11 +208,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1779357205,
-        "narHash": "sha256-cCO8aTqss5x9Ky8GWkpY0Hy5fyTZEbtifSUV8QjSzic=",
+        "lastModified": 1781577229,
+        "narHash": "sha256-lrp67w8AulE9Ks53n27I45ADSzbOCn4H+CNW1Ck8B+8=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "f83fc3c307e74bc5fd5adb7eb6b8b13ffd2a36e1",
+        "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
         "type": "github"
       },
       "original": {
@@ -154,6 +227,7 @@
         "akaia": "akaia",
         "base": "base",
         "disko": "disko",
+        "dstk": "dstk",
         "impermanence": "impermanence",
         "nixpkgs": "nixpkgs_3"
       }
