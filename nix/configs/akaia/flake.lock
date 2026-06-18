@@ -4,11 +4,11 @@
       "flake": false,
       "locked": {
         "dir": "nix/configs/akaia",
-        "lastModified": 1781771518,
-        "narHash": "sha256-tEEjtMi5Wvq501a1znW0ARgvGKsX1g81puCe1q9iY9A=",
+        "lastModified": 1781826753,
+        "narHash": "sha256-nIj1AxdgW0ZaJoCn0OszfaRq5igfen6Ii0XtIGWNbhY=",
         "owner": "fulsiram",
         "repo": "homelab",
-        "rev": "4ad2ad58e899029624dc1c431a9566872dd2193b",
+        "rev": "f8bd74c5dda31a4877ef9f07ce19c62df35325c0",
         "type": "github"
       },
       "original": {
@@ -22,11 +22,11 @@
       "flake": false,
       "locked": {
         "dir": "dependencies/git/anyproto/any-sync-dockercompose",
-        "lastModified": 1781562348,
-        "narHash": "sha256-kx7kUUCcRp4Ov8zTCVYm6i3YthfCeJU0Q0oZdSr8WaE=",
+        "lastModified": 1781826086,
+        "narHash": "sha256-nc296ff2L0FheIEsVSoK1vGAU2GVsmZIh3ipSsuyvFY=",
         "ref": "refs/heads/main",
-        "rev": "0d315e8054a09d5589a34fcafe090e54c315f243",
-        "revCount": 221,
+        "rev": "9298d230e17a56bc5cbe14c6d52f76ef5b2dd4fc",
+        "revCount": 223,
         "type": "git",
         "url": "https://codeberg.org/Akaia_Collective/dstk"
       },
@@ -47,11 +47,11 @@
       },
       "locked": {
         "dir": "nix/dev-base",
-        "lastModified": 1781771518,
-        "narHash": "sha256-tEEjtMi5Wvq501a1znW0ARgvGKsX1g81puCe1q9iY9A=",
+        "lastModified": 1781826753,
+        "narHash": "sha256-nIj1AxdgW0ZaJoCn0OszfaRq5igfen6Ii0XtIGWNbhY=",
         "owner": "fulsiram",
         "repo": "homelab",
-        "rev": "4ad2ad58e899029624dc1c431a9566872dd2193b",
+        "rev": "f8bd74c5dda31a4877ef9f07ce19c62df35325c0",
         "type": "github"
       },
       "original": {
@@ -87,11 +87,11 @@
       },
       "locked": {
         "dir": "projects/continuity_os/system",
-        "lastModified": 1781562348,
-        "narHash": "sha256-kx7kUUCcRp4Ov8zTCVYm6i3YthfCeJU0Q0oZdSr8WaE=",
+        "lastModified": 1781826086,
+        "narHash": "sha256-nc296ff2L0FheIEsVSoK1vGAU2GVsmZIh3ipSsuyvFY=",
         "ref": "refs/heads/main",
-        "rev": "0d315e8054a09d5589a34fcafe090e54c315f243",
-        "revCount": 221,
+        "rev": "9298d230e17a56bc5cbe14c6d52f76ef5b2dd4fc",
+        "revCount": 223,
         "type": "git",
         "url": "https://codeberg.org/Akaia_Collective/dstk"
       },
