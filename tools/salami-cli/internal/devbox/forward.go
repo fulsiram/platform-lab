@@ -11,7 +11,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-type AccessTarget struct {
+type ForwardTarget struct {
 	Devbox      Devbox
 	Namespace   string
 	Name        string
@@ -20,38 +20,31 @@ type AccessTarget struct {
 	PodName     string
 }
 
-func ResolveAccess(ctx context.Context, dynamicClient dynamic.Interface, kubeClient kubernetes.Interface, namespace string, name string, ownerEmail string, remotePort int) (AccessTarget, error) {
+func ResolveForwardTarget(ctx context.Context, dynamicClient dynamic.Interface, kubeClient kubernetes.Interface, namespace string, name string, remotePort int) (ForwardTarget, error) {
 	if remotePort < 1 || remotePort > 65535 {
-		return AccessTarget{}, fmt.Errorf("port %d is outside the valid range 1-65535", remotePort)
+		return ForwardTarget{}, fmt.Errorf("port %d is outside the valid range 1-65535", remotePort)
 	}
 	current, err := Get(ctx, dynamicClient, namespace, name)
 	if err != nil {
-		return AccessTarget{}, err
+		return ForwardTarget{}, err
 	}
 	if current.VMPrintableStatus != "Running" {
-		return AccessTarget{}, fmt.Errorf("devbox %s/%s is not running; current VMStatus=%s", namespace, name, valueOrDash(current.VMPrintableStatus))
-	}
-	if ownerEmail == "" {
-		return AccessTarget{}, fmt.Errorf("user email is required to verify devbox ownership")
-	}
-	expectedOwner := OwnerFromEmail(ownerEmail)
-	if current.Owner != expectedOwner {
-		return AccessTarget{}, fmt.Errorf("devbox %s/%s is owned by %s, not %s", namespace, name, valueOrDash(current.Owner), expectedOwner)
+		return ForwardTarget{}, fmt.Errorf("devbox %s/%s is not running; current VMStatus=%s", namespace, name, valueOrDash(current.VMPrintableStatus))
 	}
 	if !hasPort(current.ExposedPorts, remotePort) {
-		return AccessTarget{}, fmt.Errorf("devbox %s/%s does not expose port %d", namespace, name, remotePort)
+		return ForwardTarget{}, fmt.Errorf("devbox %s/%s does not expose port %d", namespace, name, remotePort)
 	}
 
 	service, err := resolveService(ctx, kubeClient, namespace, name, remotePort)
 	if err != nil {
-		return AccessTarget{}, err
+		return ForwardTarget{}, err
 	}
 	pod, err := resolveServicePod(ctx, kubeClient, service)
 	if err != nil {
-		return AccessTarget{}, err
+		return ForwardTarget{}, err
 	}
 
-	return AccessTarget{
+	return ForwardTarget{
 		Devbox:      current,
 		Namespace:   namespace,
 		Name:        name,

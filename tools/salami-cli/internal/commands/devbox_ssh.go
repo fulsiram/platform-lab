@@ -47,7 +47,6 @@ type devboxForwardOptions struct {
 
 type devboxSSHClient struct {
 	Config     appconfig.Config
-	Claims     auth.Claims
 	RESTConfig *rest.Config
 	Dynamic    dynamic.Interface
 	Kubernetes kubernetes.Interface
@@ -73,7 +72,7 @@ func NewDevboxSSHCmd(global *globalOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if _, err := devbox.ResolveAccess(cmd.Context(), clients.Dynamic, clients.Kubernetes, clients.Config.Namespace, name, clients.Claims.Email, opts.Port); err != nil {
+			if _, err := devbox.ResolveForwardTarget(cmd.Context(), clients.Dynamic, clients.Kubernetes, clients.Config.Namespace, name, opts.Port); err != nil {
 				return err
 			}
 			proxyCommand := buildDevboxProxyCommand(clients.Program, clients.GlobalArgs, name, opts.Port)
@@ -139,11 +138,11 @@ func NewDevboxSSHProxyCmd(global *globalOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			target, err := devbox.ResolveAccess(ctx, clients.Dynamic, clients.Kubernetes, clients.Config.Namespace, name, clients.Claims.Email, opts.Port)
+			target, err := devbox.ResolveForwardTarget(ctx, clients.Dynamic, clients.Kubernetes, clients.Config.Namespace, name, opts.Port)
 			if err != nil {
 				return err
 			}
-			err = kube.ProxyPortForward(ctx, clients.RESTConfig, target.Namespace, target.PodName, opts.Port, cmd.InOrStdin(), cmd.OutOrStdout(), cmd.ErrOrStderr())
+			err = kube.ProxySSHPortForward(ctx, clients.RESTConfig, target.Namespace, target.PodName, opts.Port, cmd.InOrStdin(), cmd.OutOrStdout(), cmd.ErrOrStderr())
 			if errors.Is(err, context.Canceled) {
 				return nil
 			}
@@ -172,7 +171,7 @@ func NewDevboxForwardCmd(global *globalOptions) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			target, err := devbox.ResolveAccess(ctx, clients.Dynamic, clients.Kubernetes, clients.Config.Namespace, name, clients.Claims.Email, opts.Port)
+			target, err := devbox.ResolveForwardTarget(ctx, clients.Dynamic, clients.Kubernetes, clients.Config.Namespace, name, opts.Port)
 			if err != nil {
 				return err
 			}
@@ -203,11 +202,8 @@ func devboxSSHClients(cmd *cobra.Command, global *globalOptions) (devboxSSHClien
 		return devboxSSHClient{}, err
 	}
 	manager := auth.NewManager(cfg, cmd.ErrOrStderr())
-	_, claims, err := manager.Token(cmd.Context())
-	if err != nil {
-		return devboxSSHClient{}, err
-	}
-	restConfig, err := kube.RESTConfigWithTokenProvider(cfg, auth.NewIDTokenProvider(manager).IDToken)
+	tokenProvider := auth.NewIDTokenProvider(manager)
+	restConfig, err := kube.RESTConfigWithTokenProvider(cfg, tokenProvider.IDToken)
 	if err != nil {
 		return devboxSSHClient{}, err
 	}
@@ -225,7 +221,6 @@ func devboxSSHClients(cmd *cobra.Command, global *globalOptions) (devboxSSHClien
 	}
 	return devboxSSHClient{
 		Config:     cfg,
-		Claims:     claims,
 		RESTConfig: restConfig,
 		Dynamic:    dynamicClient,
 		Kubernetes: kubeClient,
