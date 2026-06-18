@@ -27,8 +27,8 @@
   systemd.tpm2.enable = false;
   boot.swraid.enable = false;
 
-  boot.growPartition = false;
-  systemd.services.grow-partitions.enable = false;
+  # boot.growPartition = false;
+  # systemd.services.grow-partitions.enable = false;
 
   boot.kernelParams = [
     "console=ttyS0"
