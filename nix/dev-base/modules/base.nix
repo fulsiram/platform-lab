@@ -15,9 +15,12 @@
   boot.kernelParams = [ "console=ttyS0" ];
   boot.loader.timeout = 0;
 
-  boot.loader.grub.efiSupport = true;
-  boot.loader.grub.efiInstallAsRemovable = true;
-  boot.loader.grub.device = "nodev";
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = false;
+
+  # boot.loader.grub.efiSupport = true;
+  # boot.loader.grub.efiInstallAsRemovable = true;
+  # boot.loader.grub.device = "nodev";
 
   services.qemuGuest.enable = true;
   services.openssh.enable = true;
