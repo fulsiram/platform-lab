@@ -22,9 +22,10 @@
 
   systemd.services.initialize-ssh-keys = {
     before = [ "sshd.service" ];
-    requires = [ "secrets-ssh-keys.mount" ];
     after = [ "secrets-ssh-keys.mount" ];
     wantedBy = [ "multi-user.target" ];
+
+    unitConfig.RequiresMountsFor = [ "/secrets/ssh-keys" ];
 
     serviceConfig.Type = "oneshot";
     path = with pkgs; [ util-linux ];
