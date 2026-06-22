@@ -10,7 +10,7 @@ gitea:
       valueFrom:
         secretKeyRef:
           name: forgejo-db-app
-          key: passwd
+          key: password
 
 httpRoute:
   enabled: true
