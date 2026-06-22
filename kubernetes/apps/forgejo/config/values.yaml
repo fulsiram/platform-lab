@@ -5,12 +5,12 @@ gitea:
       HOST: forgejo-db-rw
       USER: forgejo
       NAME: forgejo
-    additionalConfigFromEnvs:
-      - name: FORGEJO__DATABASE__PASSWD
-        valueFrom:
-          secretKeyRef:
-            name: forgejo-db-app
-            key: passwd
+  additionalConfigFromEnvs:
+    - name: FORGEJO__DATABASE__PASSWD
+      valueFrom:
+        secretKeyRef:
+          name: forgejo-db-app
+          key: passwd
 
 httpRoute:
   enabled: true
