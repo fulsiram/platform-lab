@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: forgejo
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: oci://code.forgejo.org/forgejo-helm/forgejo
+      path: .
+      targetRevision: 17.1.1
+      helm:
+        releaseName: forgejo
+        valueFiles:
+          - $values/kubernetes/apps/forgejo/config/values.yaml
+    - repoURL: https://github.com/fulsiram/platform-lab.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: forgejo
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: forgejo-db
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/fulsiram/platform-lab.git
+    path: kubernetes/apps/forgejo/db/
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: forgejo
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,22 @@
+gitea:
+  config:
+    database:
+      DB_TYPE: postgres
+      HOST: forgejo-db-rw
+      USER: forgejo
+      NAME: forgejo
+    additionalConfigFromEnvs:
+      - name: FORGEJO__DATABASE__PASSWD
+        valueFrom:
+          secretKeyRef:
+            name: forgejo-db-app
+            key: passwd
+
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: gateway
+      namespace: gateway-infra
+      sectionName: https-wildcard
+  hostnames:
+    - git.salami.network
