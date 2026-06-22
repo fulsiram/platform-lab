@@ -1,5 +1,7 @@
 gitea:
   config:
+    server:
+      SSH_PORT: 2222
     database:
       DB_TYPE: postgres
       HOST: forgejo-db-rw
