@@ -20,3 +20,10 @@ httpRoute:
       sectionName: https-wildcard
   hostnames:
     - git.salami.network
+
+tcpRoute:
+  enabled: true
+  parentRefs:
+    - name: gateway
+      namespace: gateway-infra
+      sectionName: ssh
