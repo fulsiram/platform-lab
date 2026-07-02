@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/warp-tech/warpgate
-  tag: "0.23.3@sha256:82ad05d8e2248b2fb98c9f64131b209a931f093e23917d8d2dc09968a2b2ae97"
+  tag: "0.26.0@sha256:a12b1abb9de0714ef068fbf875ed1ad749f3a4c16fdd0e62b373aad4cdc07309"
   pullPolicy: IfNotPresent
 
 setup:
